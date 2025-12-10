@@ -82,8 +82,8 @@ export default function Custom({ cname, secondtext, className = "" }: { cname: s
     <main className={`flex w-full flex-col justify-around items-center grow relative`}>
       <div
         className={`text-on-background text-5xl items-center flex-col flex ${className} max-w-sm`}
-        onMouseOver={(_) => setHovering(true)}
-        onMouseOut={(_) => setHovering(false)}
+        onMouseEnter={(_) => setHovering(true)}
+        onMouseLeave={(_) => setHovering(false)}
       >
         <p className="text-center">
           {cname}
