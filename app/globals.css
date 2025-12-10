@@ -10,6 +10,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --breakpoint-md: 1200px;
+  --spacing-md: 1200px;
+  --spacing-sm: 320px;
 
   --color-background: #11140f;
   --color-error: #ffb4ab;
