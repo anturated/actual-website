@@ -13,34 +13,43 @@ export default function Custom({ cname, secondtext }: { cname: string, secondtex
   const fadeRefreshRate = 50;
   const fadeStep = targetVolume / (fadeDuration / fadeRefreshRate);
 
+  const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const clearFadeInterval = () => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+  }
+
   const fadeIn = () => {
+    clearFadeInterval();
     audioRef.current!.volume = 0;
     audioRef.current!.play();
 
-    const fadeInterval = setInterval(() => {
-      if (audioRef.current!.volume < targetVolume && isHovering) {
-        if (audioRef.current!.volume + fadeStep >= targetVolume) {
-          audioRef.current!.volume = targetVolume;
-        } else {
-          audioRef.current!.volume += fadeStep;
-        }
+    fadeIntervalRef.current = setInterval(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (audio.volume < targetVolume && isHovering) {
+        audio.volume = Math.min(audio.volume + fadeStep, targetVolume);
       } else {
-        clearInterval(fadeInterval);
+        clearFadeInterval();
       }
     }, fadeRefreshRate);
   }
 
   const fadeOut = () => {
-    const fadeInterval = setInterval(() => {
-      if (audioRef.current!.volume > 0 && !isHovering) {
-        if (audioRef.current!.volume - fadeStep <= 0) {
-          audioRef.current!.volume = 0;
-        } else {
-          audioRef.current!.volume -= fadeStep;
-        }
+    clearFadeInterval();
+
+    fadeIntervalRef.current = setInterval(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (audio.volume > 0 && !isHovering) {
+        audio.volume = Math.max(audio.volume - fadeStep, 0);
       } else {
-        clearInterval(fadeInterval);
-        audioRef.current!.pause();
+        clearFadeInterval();
+        audio.pause();
       }
     }, fadeRefreshRate);
   }
@@ -53,10 +62,6 @@ export default function Custom({ cname, secondtext }: { cname: string, secondtex
     }
   }, [isHovering])
 
-  const searchParams = useSearchParams();
-  // const cname = searchParams.get("a") ?? "Привет";
-  // const secondtext = searchParams.get("b") ?? " иди нахуй";
-
   return (
     <main className="flex w-screen flex-col justify-around items-center h-screen relative">
       <div
@@ -64,10 +69,10 @@ export default function Custom({ cname, secondtext }: { cname: string, secondtex
         onMouseOver={(_) => setHovering(true)}
         onMouseOut={(_) => setHovering(false)}
       >
-        <p>{cname}</p>
+        <p className="text-center">{cname}</p>
         {
           isHovering &&
-          <p>{secondtext}</p>
+          <p className="text-center">{secondtext}</p>
 
         }
       </div>

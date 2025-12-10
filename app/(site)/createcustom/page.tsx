@@ -31,8 +31,11 @@ export default function CreateCustom() {
   })();
 
   const onLinkClick = (() => {
+    console.log("COPY PRESSED");
     if (!link) return;
     navigator.clipboard.writeText(link);
+
+    console.log("COPY FIRED");
   })
 
   return (
@@ -42,13 +45,12 @@ export default function CreateCustom() {
         <CustomInput ref={textRef} placeholder="Text" onChange={updateLink} />
 
         <div
-          className="flex flex-col gap-2 mt-[64px]"
+          className="flex flex-col gap-2 mt-[64px] active:scale-95"
           onClick={onLinkClick}
         >
-          <p className="ml-2">
-            Click to copy
-          </p>
+          <p className="ml-2"> Click to copy </p>
           <CustomInput
+            className="pointer-events-none"
             value={link}
             placeholder="Link"
             disabled
