@@ -63,7 +63,7 @@ export default function Custom({ cname, secondtext, className = "" }: { cname: s
   }, [isHovering])
 
   return (
-    <main className={`flex w-full flex-col justify-around items-center h-screen relative`}>
+    <main className={`flex w-full flex-col justify-around items-center grow relative`}>
       <div
         className={`text-on-background text-5xl items-center flex-col flex ${className}`}
         onMouseOver={(_) => setHovering(true)}
