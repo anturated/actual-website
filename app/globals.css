@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+/* :root { */
+/*   --background: #e1e4da; */
+/*   --foreground: #11140f; */
+/* } */
+
 :root {
-  --background: #e1e4da;
-  --foreground: #11140f;
+  --background: #11140f;
+  --foreground: #e1e4da;
 }
 
 @theme inline {
@@ -66,12 +71,12 @@
   --color-tertiary-fixed-dim: #a0cfd2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #11140f;
-    --foreground: #e1e4da;
-  }
-}
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     --background: #11140f; */
+/*     --foreground: #e1e4da; */
+/*   } */
+/* } */
 
 body {
   background: var(--background);
