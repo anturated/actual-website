@@ -13,6 +13,8 @@ export default function Custom({ cname, secondtext, className = "" }: { cname: s
   const fadeRefreshRate = 50;
   const fadeStep = targetVolume / (fadeDuration / fadeRefreshRate);
 
+  const [typed, setTyped] = useState("");
+
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const clearFadeInterval = () => {
     if (fadeIntervalRef.current) {
@@ -32,6 +34,11 @@ export default function Custom({ cname, secondtext, className = "" }: { cname: s
 
       if (audio.volume < targetVolume && isHovering) {
         audio.volume = Math.min(audio.volume + fadeStep, targetVolume);
+
+        const typedLen = Math.min(Math.floor(
+          secondtext.length * audio.volume / targetVolume
+        ), secondtext.length)
+        setTyped(secondtext.substring(0, typedLen))
       } else {
         clearFadeInterval();
       }
@@ -47,6 +54,11 @@ export default function Custom({ cname, secondtext, className = "" }: { cname: s
 
       if (audio.volume > 0 && !isHovering) {
         audio.volume = Math.max(audio.volume - fadeStep, 0);
+
+        const typedLen = Math.min(Math.floor(
+          secondtext.length * audio.volume / targetVolume
+        ), secondtext.length)
+        setTyped(secondtext.substring(0, typedLen))
       } else {
         clearFadeInterval();
         audio.pause();
@@ -62,19 +74,23 @@ export default function Custom({ cname, secondtext, className = "" }: { cname: s
     }
   }, [isHovering])
 
+  useEffect(() => {
+    audioRef.current!.volume = 0;
+  }, [])
+
   return (
     <main className={`flex w-full flex-col justify-around items-center grow relative`}>
       <div
-        className={`text-on-background text-5xl items-center flex-col flex ${className}`}
+        className={`text-on-background text-5xl items-center flex-col flex ${className} max-w-sm`}
         onMouseOver={(_) => setHovering(true)}
         onMouseOut={(_) => setHovering(false)}
       >
-        <p className="text-center">{cname}</p>
-        {
-          isHovering &&
-          <p className="text-center">{secondtext}</p>
-
-        }
+        <p className="text-center">
+          {cname}
+          <span>
+            {" " + typed}
+          </span>
+        </p>
       </div>
 
       <Image
