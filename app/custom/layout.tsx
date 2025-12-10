@@ -1,13 +1,5 @@
-import type { Metadata } from "next";
 import '@fontsource/maple-mono'
 import "../globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
-export const metadata: Metadata = {
-  title: "Desant",
-  description: "Web site",
-};
 
 export default function RootLayout({
   children,
