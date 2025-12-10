@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-export default function Custom({ cname, secondtext }: { cname: string, secondtext: string }) {
+export default function Custom({ cname, secondtext, className = "" }: { cname: string, secondtext: string, className?: string }) {
   const [isHovering, setHovering] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -63,9 +63,9 @@ export default function Custom({ cname, secondtext }: { cname: string, secondtex
   }, [isHovering])
 
   return (
-    <main className="flex w-screen flex-col justify-around items-center h-screen relative">
+    <main className={`flex w-full flex-col justify-around items-center h-screen relative`}>
       <div
-        className="text-on-background text-5xl items-center flex-col flex"
+        className={`text-on-background text-5xl items-center flex-col flex ${className}`}
         onMouseOver={(_) => setHovering(true)}
         onMouseOut={(_) => setHovering(false)}
       >
@@ -78,7 +78,7 @@ export default function Custom({ cname, secondtext }: { cname: string, secondtex
       </div>
 
       <Image
-        className="absolute bottom-[30px] right-[30px] transition-opacity duration-500"
+        className={`absolute bottom-[30px] right-[30px] transition-opacity duration-500 ${className}`}
         style={{ opacity: `${isHovering ? 100 : 0}%` }}
         src="/spongebob-dance.gif"
         alt="spunchbop"

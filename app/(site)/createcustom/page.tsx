@@ -1,6 +1,7 @@
 "use client"
 
 import { encryptCustom } from "@/app/actions/encryptCustom";
+import Custom from "@/app/custom/view";
 import { forwardRef, InputHTMLAttributes, useEffect, useRef, useState } from "react"
 
 export default function CreateCustom() {
@@ -59,7 +60,12 @@ export default function CreateCustom() {
       </div>
       {/* preview */}
       <div className="flex flex-col justify-around items-center bg-surface-container rounded-lg w-full grow">
-        <p className="italic text-outline">Preview coming soon!</p>
+        <Custom
+          className="scale-75"
+          cname={nameRef.current?.value ?? "Привет"}
+          secondtext={textRef.current?.value ?? "иди нахуй"}
+        />
+        {/* <p className="italic text-outline">Preview coming soon!</p> */}
       </div>
     </div >
   )

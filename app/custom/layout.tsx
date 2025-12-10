@@ -16,11 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`flex flex-col items-center antialiased min-h-screen`} >
+      <body className={`flex flex-col items-center antialiased min-h-screen w-screen`} >
 
-        <div className="flex-grow">
-          {children}
-        </div>
+        {children}
 
       </body>
     </html>
