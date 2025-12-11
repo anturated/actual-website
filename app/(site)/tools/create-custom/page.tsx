@@ -2,7 +2,8 @@
 
 import { encryptCustom } from "@/app/actions/encryptCustom";
 import Custom from "@/app/custom/view";
-import { forwardRef, InputHTMLAttributes, useRef, useState } from "react"
+import { useRef, useState } from "react";
+import { CustomInput } from "@/components/CustomInput";
 
 export default function CreateCustom() {
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -71,19 +72,3 @@ export default function CreateCustom() {
   )
 }
 
-const CustomInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>((props, ref) => {
-  const { className, ...rest } = props;
-
-  return (
-    <input
-      className={`bg-surface-container disabled:bg-background
-                  text-on-background disabled:text-outline
-                  outline-outline-variant focus:outline-primary
-                  outline-2
-                  rounded-lg px-2 py-2
-                  ${className}`}
-      ref={ref}
-      {...rest}
-    />
-  )
-})
