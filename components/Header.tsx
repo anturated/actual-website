@@ -24,7 +24,7 @@ export default function Header() {
         {/* breadcrumps */}
         <div className="flex flex-row">
           {
-            crumps.map(c => <span>
+            crumps.map((c, key) => <span key={key}>
               {"/"}
               <Link href={c.href} className="text-secondary">{c.text}</Link>
             </span>)
