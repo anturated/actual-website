@@ -2,7 +2,7 @@
 
 import { encryptCustom } from "@/app/actions/encryptCustom";
 import Custom from "@/app/custom/view";
-import { forwardRef, InputHTMLAttributes, useEffect, useRef, useState } from "react"
+import { forwardRef, InputHTMLAttributes, useRef, useState } from "react"
 
 export default function CreateCustom() {
   const nameRef = useRef<HTMLInputElement | null>(null);

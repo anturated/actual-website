@@ -1,7 +1,6 @@
 "use client"
 
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function Custom({ cname, secondtext, className = "" }: { cname: string, secondtext: string, className?: string }) {
