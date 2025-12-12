@@ -2,6 +2,7 @@
 
 import { login } from "@/app/actions/login";
 import { register } from "@/app/actions/register";
+import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { ButtonHTMLAttributes, forwardRef, useRef, useState } from "react";
 
@@ -72,17 +73,12 @@ function CustomForm({
         ref={passwordRef}
       />
 
-      <button
-        className={`
-          rounded-lg p-2 w-full outline-2
-          outline-secondary hover:outline-primary active:outline-outline
-          bg-secondary-container hover:bg-primary-container active:bg-surface-container-highest
-          text-on-secondary-container hover:text-on-primary-container active:text-outline
-        `}
+      <CustomButton
+        className="w-full"
         type="submit"
       >
         {buttonText}
-      </button>
+      </CustomButton>
     </form >
   )
 }

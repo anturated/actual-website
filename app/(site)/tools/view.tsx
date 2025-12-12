@@ -1,9 +1,10 @@
 import logout from "@/app/actions/logout"
+import { CustomButton } from "@/components/CustomButton"
 import { Perm, permsAllow } from "@/lib/perms"
 import Link from "next/link"
 
 export default function ToolsView({ perms = [] }: { perms?: Perm[] }) {
-  return (
+  return <>
     <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-[8px]">
       <Tool title="Troll Generator"
         href="tools/create-custom"
@@ -26,14 +27,14 @@ export default function ToolsView({ perms = [] }: { perms?: Perm[] }) {
         />
       }
 
-      {perms.length > 0 &&
-        <button
-          onClick={logout}
-        >Log out</button>
-      }
-
     </div>
-  )
+    {perms.length > 0 &&
+      <CustomButton onClick={logout}>
+        logout
+      </CustomButton >
+    }
+  </>
+
 }
 
 export function Tool({ title, description, href }: { title: string, description?: string, href: string }) {
