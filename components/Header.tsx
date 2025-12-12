@@ -1,18 +1,15 @@
-"use client";
+"use server";
 
 import Link from "next/link";
 import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import BreadCrumps from "./BreadCrumps";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import { SessionData, sessionOptions } from "@/lib/session";
 
-export default function Header() {
-  const parts = usePathname()
-    .split("/")
-    .filter(Boolean);
-
-  const crumps = parts.map((part, i) => ({
-    text: decodeURIComponent(part),
-    href: "/" + parts.slice(0, i + 1).join("/"),
-  }))
+export default async function Header() {
+  const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
+  const user = session.user;
 
   return (
     <div className="flex flex-row justify-between items-center text-center text-sm h-[75px] w-full max-w-md mx-auto px-[8px] md:px-0">
@@ -31,9 +28,15 @@ export default function Header() {
         <HeaderLink href="/tools">
           tools
         </HeaderLink>
-        <HeaderLink href="/login">
-          login
-        </HeaderLink>
+        {!user ? (
+          <HeaderLink href="/login">
+            login
+          </HeaderLink>
+        ) : (
+          <HeaderLink href="/dashboard">
+            dash
+          </HeaderLink>
+        )}
       </nav>
       {/* TODO: add theme switcher */}
       {/* <MaterialIcon> */}

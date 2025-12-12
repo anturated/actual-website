@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@fontsource/maple-mono": "^5.2.6",
+    "@prisma/client": "^6.18.0",
+    "bcryptjs": "^3.0.3",
+    "iron-session": "^8.0.4",
     "next": "^16.0.8",
     "react": "19.2.0",
     "react-dom": "19.2.0"
@@ -20,8 +23,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
+    "prisma": "^6.18.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
