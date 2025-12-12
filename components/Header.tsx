@@ -33,8 +33,8 @@ export default async function Header() {
             login
           </HeaderLink>
         ) : (
-          <HeaderLink href="/dashboard">
-            dash
+          <HeaderLink href="/#">
+            <span className="text-tertiary">{user.username}</span>
           </HeaderLink>
         )}
       </nav>

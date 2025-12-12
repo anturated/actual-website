@@ -23,9 +23,10 @@ export async function login(formData: FormData) {
   const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
   session.user = {
     id: user.id,
+    username: user.username,
     perms: user.perms as Perm[]
   };
   await session.save();
 
-  redirect("/dashboard");
+  redirect("/tools");
 }

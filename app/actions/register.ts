@@ -1,5 +1,6 @@
 "use server";
 
+import { Perm } from "@/lib/perms";
 import { prisma } from "@/lib/prisma";
 import { SessionData, sessionOptions } from "@/lib/session";
 import bcrypt from "bcryptjs";
@@ -27,8 +28,12 @@ export async function register(formData: FormData) {
   });
 
   const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
-  session.user = { id: newUser.id }
+  session.user = {
+    id: newUser.id,
+    username: newUser.username,
+    perms: newUser.perms as Perm[],
+  }
   await session.save();
 
-  redirect("/dashboard");
+  redirect("/tools");
 }

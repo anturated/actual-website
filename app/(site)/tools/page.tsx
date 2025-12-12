@@ -1,43 +1,13 @@
-import Link from "next/link"
+"use server";
 
-export default function Tools() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-[8px]">
-      <Tool title="Troll Generator"
-        href="tools/create-custom"
-        description="Generate troll"
-      />
+import { SessionData, sessionOptions } from "@/lib/session";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import ToolsView from "./view";
 
-      <Tool title="TBA"
-        href="#"
-        description="To be added."
-      />
+export default async function Tools() {
+  const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
+  const perms = session.user?.perms
 
-      <Tool title="TBA"
-        href="#"
-        description="To be added."
-      />
-
-      <Tool title="TBA"
-        href="#"
-        description="To be added."
-      />
-
-    </div>
-  )
-}
-
-export function Tool({ title, description, href }: { title: string, description?: string, href: string }) {
-  return (
-    <div className="flex flex-col gap-[8px] outline-2 outline-outline p-[10px] rounded-2xl">
-      <Link
-        className="font-bold underline text-primary"
-        href={href}>
-        {title}
-      </Link>
-      <p>
-        {description}
-      </p>
-    </div>
-  )
+  return <ToolsView perms={perms} />
 }

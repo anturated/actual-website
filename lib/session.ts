@@ -13,7 +13,8 @@ export const sessionOptions: SessionOptions = {
 
 export type SessionUser = {
   id: string;
-  perms?: Perm[],
+  username: string
+  perms: Perm[],
 }
 
 export type SessionData = {
