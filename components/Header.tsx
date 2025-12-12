@@ -22,14 +22,7 @@ export default function Header() {
           anturated
         </Link>
         {/* breadcrumps */}
-        <div className="flex flex-row">
-          {
-            crumps.map((c, key) => <span key={key}>
-              {"/"}
-              <Link href={c.href} className="text-secondary">{c.text}</Link>
-            </span>)
-          }
-        </div>
+        <BreadCrumps />
       </div>
       <nav className="flex flex-row gap-[15px]">
         <HeaderLink href="/blog">
