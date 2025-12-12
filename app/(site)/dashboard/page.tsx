@@ -1,13 +1,17 @@
-"use client";
+"use server"
 
-import logout from "@/app/actions/logout";
+import { getIronSession } from "iron-session"
+import DashboardView from "./view"
+import { cookies } from "next/headers"
+import { SessionData, sessionOptions } from "@/lib/session"
 
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
 
-  return <button
-    onClick={logout}
-  >
-    logout
-  </button>
+  if (!session.user) return "go log in";
+
+  const perms = session.user.perms
+
+  return <DashboardView perms={perms!} />
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { Perm } from "@/lib/perms";
 import { prisma } from "@/lib/prisma";
 import { SessionData, sessionOptions } from "@/lib/session";
 import bcrypt from "bcryptjs";
@@ -20,7 +21,10 @@ export async function login(formData: FormData) {
   if (!isValid) return { error: "Invalid credentials" }
 
   const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
-  session.user = { id: user.id };
+  session.user = {
+    id: user.id,
+    perms: user.perms as Perm[]
+  };
   await session.save();
 
   redirect("/dashboard");

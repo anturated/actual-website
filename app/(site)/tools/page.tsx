@@ -27,7 +27,7 @@ export default function Tools() {
   )
 }
 
-function Tool({ title, description, href }: { title: string, description?: string, href: string }) {
+export function Tool({ title, description, href }: { title: string, description?: string, href: string }) {
   return (
     <div className="flex flex-col gap-[8px] outline-2 outline-outline p-[10px] rounded-2xl">
       <Link

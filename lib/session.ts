@@ -1,4 +1,5 @@
 import { SessionOptions } from "iron-session";
+import { Perm } from "./perms";
 
 export const sessionOptions: SessionOptions = {
   password: process.env.SESSION_SECRET!,
@@ -12,6 +13,7 @@ export const sessionOptions: SessionOptions = {
 
 export type SessionUser = {
   id: string;
+  perms?: Perm[],
 }
 
 export type SessionData = {
