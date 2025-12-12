@@ -2,13 +2,13 @@
 
 import logout from "@/app/actions/logout";
 import { Tool } from "../tools/page";
-import { Perm } from "@/lib/perms";
+import { Perm, permsAllow } from "@/lib/perms";
 
 
 export default function DashboardView({ perms }: { perms: Perm[] }) {
   return <>
     <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-[8px]">
-      {perms.includes("admin") &&
+      {permsAllow("/notes", perms) &&
         <Tool
           title="Notes"
           description="View notes"

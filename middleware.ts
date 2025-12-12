@@ -1,21 +1,17 @@
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, } from "next/server";
 import { SessionData, sessionOptions } from "./lib/session";
 import { prisma } from "./lib/prisma";
-import { Perm } from "./lib/perms";
+import { Perm, permsAllow, PROTECTED_ROUTES, ROLE_PROTECTED_ROUTES } from "./lib/perms";
 
-const PROTECTED_ROUTES: string[] = ["/dashboard"]
-const ROLE_PROTECTED_ROUTES: Record<string, Perm[]> = {
-  "/notes": ["note_view", "note_edit", "admin"]
-}
-
-export async function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const res = NextResponse.next()
 
   // allow public pages
   const pathname = req.nextUrl.pathname;
-  const isPublic = !PROTECTED_ROUTES.includes(pathname);
+  const protectedKey = Object.keys(ROLE_PROTECTED_ROUTES).find(r => pathname.startsWith(r));
+  const isPublic = !PROTECTED_ROUTES.includes(pathname) && !protectedKey;
 
   if (isPublic) return res;
 
@@ -28,28 +24,28 @@ export async function middleware(req: NextRequest) {
   }
 
   // invalidate session if needed
-  if (user) {
-    const dbUser = await prisma.user.findUnique({
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { sessionInvalidated: true, perms: true },
+  });
+
+  if (dbUser?.sessionInvalidated) {
+    // update db
+    await prisma.user.update({
       where: { id: user.id },
-      select: { sessionInvalidated: true },
-    });
+      data: { sessionInvalidated: false },
+    })
 
-    if (dbUser?.sessionInvalidated) {
-      // update db
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { sessionInvalidated: false },
-      })
+    //log out
+    session.destroy();
+    await session.save();
 
-      //log out
-      session.destroy();
-      await session.save();
-
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // TODO: restrict role protected pages
+  // restrict role-protected pages
+  if (protectedKey && dbUser?.perms && !permsAllow(protectedKey, dbUser.perms as Perm[]))
+    return NextResponse.redirect(new URL(req.headers.get("referer") ?? "/"));
 
   return res;
 }
