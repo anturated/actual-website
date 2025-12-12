@@ -12,7 +12,6 @@ export async function login(formData: FormData) {
   const username = formData.get("username")?.toString()!;
   const password = formData.get("password")?.toString()!;
 
-  // TODO: add prisma bs
   const user = await prisma.user.findUnique({ where: { username } });
 
   if (!user) return { error: "Invalid credentials" };
