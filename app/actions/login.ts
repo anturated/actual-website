@@ -22,7 +22,7 @@ export async function login(formData: FormData) {
 
   const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
   session.user = { id: user.id };
-  session.save();
+  await session.save();
 
   redirect("/dashboard");
 }
