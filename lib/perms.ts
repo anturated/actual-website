@@ -6,7 +6,7 @@ export const ALL_PERMS = [
 export const LOGIN_PROTECTED_ROUTES: string[] = ["/dashboard"]
 
 export const ROLE_PROTECTED_ROUTES: Record<string, Perm[]> = {
-  "/notes": ["note_view", "note_edit", "admin"],
+  "/tools/notes": ["note_view", "note_edit", "admin"],
   "/admin": ["admin"],
 } as const;
 

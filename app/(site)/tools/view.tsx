@@ -7,15 +7,15 @@ export default function ToolsView({ perms = [] }: { perms?: Perm[] }) {
   return <>
     <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-[8px]">
       <Tool title="Troll Generator"
-        href="tools/create-custom"
+        href="/tools/create-custom"
         description="Generate troll"
       />
 
-      {permsAllow("/notes", perms) &&
+      {permsAllow("/tools/notes", perms) &&
         <Tool
           title="Notes"
           description="View notes"
-          href="/notes"
+          href="/tools/notes"
         />
       }
 
