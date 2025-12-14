@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import BreadCrumps from "./BreadCrumps";
-import useSWR, { Fetcher } from "swr";
-import { MeResponse } from "@/app/api/me/route";
+import useSWR from "swr";
+import { meFetcher } from "@/lib/fetchers";
 
 export default function Header() {
   return (
@@ -37,13 +37,7 @@ export default function Header() {
 }
 
 function LoginButton() {
-  const fetcher: Fetcher<MeResponse, string> = (url: string) =>
-    fetch(url).then(r => {
-      if (!r.ok) throw new Error("fetch failed");
-      return r.json();
-    })
-
-  const { data } = useSWR('/api/me', fetcher);
+  const { data } = useSWR('/api/me', meFetcher);
 
   return data?.user ? (
 
