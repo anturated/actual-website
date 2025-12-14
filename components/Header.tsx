@@ -1,26 +1,22 @@
-"use server";
+"use client";
 
 import Link from "next/link";
 import { ReactNode } from "react";
 import BreadCrumps from "./BreadCrumps";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
-import { SessionData, sessionOptions } from "@/lib/session";
+import useSWR, { Fetcher } from "swr";
+import { MeResponse } from "@/app/api/me/route";
 
-export default async function Header() {
-  const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
-  const user = session.user;
-
+export default function Header() {
   return (
     <div className="flex flex-row justify-between items-center text-center text-sm h-[75px] w-full max-w-md mx-auto px-[8px] md:px-0">
+
       <div className="flex flex-col md:flex-row items-start">
-        {/* homepage link */}
         <Link href="/" className="font-bold text-primary">
           anturated
         </Link>
-        {/* breadcrumps */}
         <BreadCrumps />
       </div>
+
       <nav className="flex flex-row gap-[15px]">
         <HeaderLink href="/blog">
           posts
@@ -28,21 +24,37 @@ export default async function Header() {
         <HeaderLink href="/tools">
           tools
         </HeaderLink>
-        {!user ? (
-          <HeaderLink href="/login">
-            login
-          </HeaderLink>
-        ) : (
-          <HeaderLink href="/#">
-            <span className="text-tertiary">{user.username}</span>
-          </HeaderLink>
-        )}
+
+        <LoginButton />
       </nav>
+
       {/* TODO: add theme switcher */}
       {/* <MaterialIcon> */}
       {/*   bedtime */}
       {/* </MaterialIcon> */}
     </div>
+  )
+}
+
+function LoginButton() {
+  const fetcher: Fetcher<MeResponse, string> = (url: string) =>
+    fetch(url).then(r => {
+      if (!r.ok) throw new Error("fetch failed");
+      return r.json();
+    })
+
+  const { data } = useSWR('/api/me', fetcher);
+
+  return data?.user ? (
+
+    <HeaderLink href="#" >
+      {data.user.username}
+    </HeaderLink>
+  ) : (
+
+    <HeaderLink href="/login">
+      login
+    </HeaderLink>
   )
 }
 

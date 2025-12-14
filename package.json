@@ -15,7 +15,8 @@
     "iron-session": "^8.0.4",
     "next": "^16.0.8",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "swr": "^2.3.7"
   },
   "devDependencies": {
     "@material-symbols/font-400": "^0.40.0",
