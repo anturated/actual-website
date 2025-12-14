@@ -42,7 +42,7 @@ function LoginButton() {
   return data?.user ? (
 
     <HeaderLink href="#" >
-      {data.user.username}
+      <span className="text-tertiary">{data.user.username}</span>
     </HeaderLink>
   ) : (
 
