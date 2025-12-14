@@ -1,4 +1,4 @@
-import MaterialIcon from "@/components/MaterialIcon";
+import { MaterialIcon } from "@/components/MaterialIcon";
 
 export default function Home() {
   return (
