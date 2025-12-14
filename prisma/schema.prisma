@@ -23,4 +23,17 @@ model User {
   perms        String[] @default([])
 
   sessionInvalidated Boolean @default(false)
+  notes              Note[]
+}
+
+model Note {
+  id String @id @default(uuid())
+
+  owner    User    @relation(fields: [ownerId], references: [id])
+  ownerId  String
+  isPublic Boolean
+
+  title String
+  text  String  @default("")
+  done  Boolean @default(false)
 }
