@@ -26,11 +26,11 @@ export default function ToolsView() {
           />
         }
 
-        {permsAllow("/admin", data.user.perms) &&
+        {permsAllow("/tools/edit-users", data.user.perms) &&
           <Tool
             title="Edit users"
             description="View and edit user list."
-            href="/admin/edit-users"
+            href="/tools/edit-users"
           />
         }
       </>}
