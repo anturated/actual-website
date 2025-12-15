@@ -1,5 +1,6 @@
 import { MeResponse } from "@/app/api/me/route";
 import { NotesResponse } from "@/app/api/notes/route";
+import { UsersResponse } from "@/app/api/users/route";
 import { Fetcher } from "swr";
 
 export const meFetcher: Fetcher<MeResponse, string> = (url: string) =>
@@ -14,3 +15,9 @@ export const notesFetcher: Fetcher<NotesResponse, string> = (url: string) =>
     return r.json()
   })
 
+
+export const usersFetcher: Fetcher<UsersResponse, string> = (url: string) =>
+  fetch(url).then(r => {
+    if (!r.ok) throw new Error("Fetch failed")
+    return r.json()
+  })
