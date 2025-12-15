@@ -168,7 +168,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
   return (
     <div className="flex flex-col grow gap-4 p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
 
-      <div className="flex flex-row gap-4 text-xl">
+      <div className="flex flex-row gap-1 md:4 text-xl">
         <button onClick={() => setDone(!done)}>
           <MaterialIcon>
             {done ? "check_box" : "check_box_outline_blank"}
@@ -182,7 +182,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
           defaultValue={initialTitle}
         />
         <button
-          className="hover:text-error cursor-pointer"
+          className="text-error md:text-on-surface hover:text-error cursor-pointer"
           onClick={onCloseEdit}
         >
           <MaterialIcon>
@@ -198,7 +198,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
         defaultValue={initialText}
       />
 
-      <div className="flex flex-row justify-end gap-3">
+      <div className="flex flex-row justify-between md:justify-end gap-3">
         <PrivateButton
           isPublic={isPublic}
           setIsPublic={setIsPublic}
@@ -239,10 +239,10 @@ function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdit: any, onDelet
 
       {hovered && <div className="flex flex-row text-sm absolute right-0 top-0 m-2 gap-2">
         <button onClick={() => onEdit(data)}>
-          <MaterialIcon className="text-secondary-container hover:text-secondary cursor-pointer">edit</MaterialIcon>
+          <MaterialIcon className="text-secondary md:text-secondary-container hover:text-secondary cursor-pointer">edit</MaterialIcon>
         </button>
         <button onClick={() => onDelete(data)}>
-          <MaterialIcon className="text-error-container hover:text-error cursor-pointer">delete</MaterialIcon>
+          <MaterialIcon className="text-error md:text-error-container hover:text-error cursor-pointer">delete</MaterialIcon>
         </button>
       </div>}
     </div >
