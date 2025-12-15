@@ -176,7 +176,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
         </button>
 
         <input
-          className="grow hover:underline focus:hover:no-underline decoration-outline outline-none p-3 rounded-lg focus:bg-surface-container-high"
+          className="grow hover:underline focus:hover:no-underline decoration-outline outline-none p-3 rounded-lg focus:bg-surface-container-high min-w-0"
           placeholder="Title"
           ref={titleRef}
           defaultValue={initialTitle}
