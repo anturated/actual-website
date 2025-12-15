@@ -97,7 +97,7 @@ export default function NotesView() {
   }
 
   return (
-    <div className="relative grow">
+    <div className="relative grow w-full">
       <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${editingNote ? "blur-sm" : ""}`}>
         <div className="flex flex-col justify-between gap-4">
           <CustomInput
