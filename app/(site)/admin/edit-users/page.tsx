@@ -5,7 +5,7 @@ import { usersFetcher } from "@/lib/fetchers";
 import { UserDTO } from "@/data/user-dto";
 import { CustomInput } from "@/components/CustomInput";
 import { ALL_PERMS, Perm } from "@/lib/perms";
-import { FormEvent, useMemo, useReducer, useRef, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import { CustomButton } from "@/components/CustomButton";
 
 type UserEdit = {
@@ -218,11 +218,6 @@ const ROLE_CLASS: Record<RoleState, string> = {
 } as const;
 
 function Role({ perm, state = "default", onClick }: { perm: Perm, state?: RoleState, onClick: any }) {
-  const textColor = useMemo(() =>
-    state === "added" ? "primary" : state === "removed" ? "error" : "secondary",
-    [state]
-  );
-
   return (
     <button
       onClick={onClick}
