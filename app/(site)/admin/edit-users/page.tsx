@@ -158,15 +158,10 @@ function UserListItem({
   const roleData = useMemo(() => {
     const base = [...origUser.perms, ...(edits?.removeRoles ?? [])].map(p => ({
       perm: p,
-      state: (edits?.removeRoles?.includes(p) ? "removed" : "default") as RoleState,
+      state: (edits?.removeRoles?.includes(p) ? "removed" : edits?.addRoles?.includes(p) ? "added" : "default") as RoleState,
     }));
 
-    const added =
-      edits?.addRoles
-        ?.filter(r => !origUser.perms.includes(r))
-        .map(r => ({ perm: r, state: "added" as RoleState })) ?? [];
-
-    return [...base, ...added];
+    return [...base];
   }, [origUser.perms, edits]);
 
   const onRoleSubmit = (e: FormEvent<HTMLFormElement>) => {
