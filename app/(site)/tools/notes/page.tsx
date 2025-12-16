@@ -220,12 +220,12 @@ function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdit: any, onDelet
         flex items-center justify-around relative
         outline-2 outline-outline-variant bg-surface-container
         text-on-surface text-sm
-        rounded-lg min-h-20
+        rounded-lg h-28
       `}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <p className="text-outline blur-sm text-wrap">
+      <p className="text-outline blur-sm outline-surface-container-low max-h-28 text-wrap overflow-hidden">
         {data.text}
       </p>
 
