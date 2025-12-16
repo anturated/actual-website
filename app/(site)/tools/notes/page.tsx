@@ -67,9 +67,12 @@ export default function NotesView() {
       body: JSON.stringify(note)
     })
 
-    mutate()
+    await mutate()
 
-    setEditingNote(null);
+    setEditingNote(n => {
+      if (!n) return null;
+      return data?.notes?.find(d => d.id === n.id) ?? null
+    });
   }
 
   const onDelete = async (note: Note) => {
