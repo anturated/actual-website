@@ -71,6 +71,19 @@
   --color-tertiary-fixed-dim: #a0cfd2;
 }
 
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-outline);
+  border-radius: 999px;
+}
+
 /* @media (prefers-color-scheme: dark) { */
 /*   :root { */
 /*     --background: #11140f; */
