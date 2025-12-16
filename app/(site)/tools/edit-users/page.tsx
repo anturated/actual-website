@@ -202,8 +202,8 @@ function UserListItem({
       </div>
 
       <form onSubmit={onRoleSubmit} >
-        <CustomInput list="perms" ref={addRoleRef} />
-        <datalist id="perms">
+        <CustomInput list={`perms-${origUser.username}`} ref={addRoleRef} className="max-w-3xs" />
+        <datalist id={`perms-${origUser.username}`}>
           {ALL_PERMS.map(p => <option value={p} key={p} />)}
         </datalist>
       </form>
