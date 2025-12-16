@@ -139,9 +139,16 @@ export default function EditUsers() {
     }
 
     {Object.keys(edits).length > 0 &&
-      <CustomButton onClick={onSaveChanges}>
-        Save changes
-      </CustomButton>
+      <div className="flex flex-row gap-4">
+
+        <CustomButton onClick={onSaveChanges}>
+          Save changes
+        </CustomButton>
+
+        <CustomButton onClick={() => setEdits({})}>
+          Cancel
+        </CustomButton>
+      </div>
     }
   </>)
 }
