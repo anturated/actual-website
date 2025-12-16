@@ -245,12 +245,13 @@ function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdit: any, onDelet
 function PrivateButton({ isPublic, setIsPublic }: { isPublic: Boolean, setIsPublic: any }) {
   return (
     <CustomButton
+      className="min-w-[8rem] flex"
       onClick={() => setIsPublic(!isPublic)}
     >
-      <MaterialIcon className="align-middle">
+      <MaterialIcon className="align-middle flex">
         {isPublic ? "visibility" : "visibility_off"}
       </MaterialIcon>
-      {isPublic ? " Public" : " Private"}
+      <span className="flex-1 align-middle justify-around">{isPublic ? " Public" : " Private"}</span>
     </CustomButton>
   )
 }
