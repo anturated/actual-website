@@ -33,11 +33,8 @@ export default function CreateCustom() {
   })();
 
   const onLinkClick = (() => {
-    console.log("COPY PRESSED");
     if (!link) return;
     navigator.clipboard.writeText(link);
-
-    console.log("COPY FIRED");
   })
 
   return (

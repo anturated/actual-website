@@ -168,10 +168,7 @@ function UserListItem({
     e.preventDefault();
 
     const perm = addRoleRef.current?.value;
-    if (!perm || !ALL_PERMS.includes(perm as Perm)) {
-      console.log("error here " + (perm ? "perm exists " : "") + (ALL_PERMS.includes(perm as Perm) ? "its in the thing " : ""));
-      return
-    }
+    if (!perm || !ALL_PERMS.includes(perm as Perm)) return
 
     onRoleAdd(origUser.id, perm);
 

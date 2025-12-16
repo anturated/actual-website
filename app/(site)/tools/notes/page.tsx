@@ -18,15 +18,11 @@ export default function NotesView() {
   const [isPublic, setIsPublic] = useState(false);
 
   const addNote = async () => {
-    console.log(">>> ENTER ADDNOTE")
     const title = titleRef.current?.value
     const notes = data?.notes
     const ownerId = userData?.user?.id
 
-    if (!notes || !ownerId || !title) {
-      console.log("fail at button")
-      return
-    }
+    if (!notes || !ownerId || !title) return
 
     const note = {
       id: crypto.randomUUID(),
@@ -40,14 +36,11 @@ export default function NotesView() {
     // optimistic update
     mutate({ notes: [...notes, note] }, false)
 
-    console.log("trying to write changes")
     await fetch("/api/notes", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(note)
     });
-
-    console.log("done")
 
     mutate()
   }

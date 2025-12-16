@@ -41,10 +41,8 @@ export async function PUT(req: NextRequest) {
   let res: NoteResponse;
 
   try {
-    console.log("parsing request")
     const { ownerId, done, title, isPublic, ...rest } = await req.json();
 
-    console.log("creating note")
     const note = await prisma.note.create({
       data: {
         ownerId, done, title, isPublic,
@@ -52,14 +50,11 @@ export async function PUT(req: NextRequest) {
       }
     });
 
-    console.log("setting result")
     res = { note }
   } catch (e) {
-    console.log(e);
     res = { error: String(e) }
   }
 
-  console.log("returning result")
   return NextResponse.json(res)
 }
 
@@ -78,7 +73,6 @@ export async function PATCH(req: NextRequest) {
     res = { note: note }
   } catch (e) {
     res = { error: String(e) }
-    console.error(e)
   }
 
   return NextResponse.json(res);
