@@ -11,7 +11,7 @@ export default function Header() {
     <div className="flex flex-row justify-between items-center text-center text-sm h-[75px] w-full max-w-md mx-auto px-[8px] md:px-0">
 
       <div className="flex flex-col md:flex-row items-start">
-        <Link href="/" className="font-bold text-primary">
+        <Link href="/" className="font-bold text-primary select-none">
           anturated
         </Link>
         <BreadCrumps />
@@ -55,7 +55,7 @@ function LoginButton() {
 function HeaderLink({ href, children }: { href: string, children?: ReactNode }) {
   return (
     <Link
-      className="text-secondary font-semibold"
+      className="text-secondary font-semibold select-none"
       href={href}>
       {children}
     </Link>

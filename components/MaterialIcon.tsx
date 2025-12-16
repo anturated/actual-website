@@ -7,7 +7,7 @@ export const MaterialIcon = forwardRef<HTMLSpanElement, React.HTMLAttributes<HTM
 
   return (
     <span
-      className={`material-symbols-outlined ${className}`}
+      className={`material-symbols-outlined select-none ${className}`}
       ref={ref}
       {...rest}
     />

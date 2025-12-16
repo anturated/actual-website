@@ -228,7 +228,7 @@ function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdit: any, onDelet
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <p className="text-outline blur-sm outline-surface-container-low max-h-28 text-wrap overflow-hidden">
+      <p className="text-outline blur-sm outline-surface-container-low max-h-28 text-wrap overflow-hidden select-none">
         {data.text}
       </p>
 

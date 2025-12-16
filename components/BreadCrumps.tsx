@@ -16,7 +16,7 @@ export default function BreadCrumps() {
   return (
     <div className="flex flex-row">
       {
-        crumps.map((c, key) => <span key={key}>
+        crumps.map((c, key) => <span key={key} className="select-none">
           {"/"}
           <Link href={c.href} className="text-secondary">{c.text}</Link>
         </span>)
