@@ -41,7 +41,10 @@ export default function EditUsers() {
         perms,
         __dirty: Boolean(edits[u.id]),
       }
-    })
+    }) // map end
+      .sort((a, b) =>
+        a.username.localeCompare(b.username)
+      );
   }, [data?.users, edits]);
 
   const onRoleAdd = (id: string, role: Perm) => {
@@ -161,7 +164,8 @@ function UserListItem({
       state: (edits?.removeRoles?.includes(p) ? "removed" : edits?.addRoles?.includes(p) ? "added" : "default") as RoleState,
     }));
 
-    return [...base];
+    return [...base].sort((a, b) =>
+      a.perm.localeCompare(b.perm));
   }, [origUser.perms, edits]);
 
   const onRoleSubmit = (e: FormEvent<HTMLFormElement>) => {

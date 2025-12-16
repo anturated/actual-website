@@ -5,7 +5,7 @@ import { CustomInput } from "@/components/CustomInput";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { meFetcher, notesFetcher } from "@/lib/fetchers";
 import { Note } from "@prisma/client";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import useSWR from "swr"
 
 export default function NotesView() {
@@ -16,6 +16,13 @@ export default function NotesView() {
 
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isPublic, setIsPublic] = useState(false);
+
+  const sortedNotes = useMemo(() => {
+    if (!data?.notes) return null;
+
+    return data.notes.slice() // avoid changing the orig
+      .sort((a, b) => a.title.localeCompare(b.title));
+  }, [data]);
 
   const addNote = async () => {
     const title = titleRef.current?.value
@@ -114,7 +121,7 @@ export default function NotesView() {
           </div>
         </div>
 
-        {data?.notes && data.notes.map((n, key) =>
+        {sortedNotes && sortedNotes.map((n, key) =>
           <NoteCard
             data={n} key={key}
             onEdit={onEdit}
