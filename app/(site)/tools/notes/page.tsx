@@ -5,7 +5,7 @@ import { CustomInput } from "@/components/CustomInput";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { meFetcher, notesFetcher } from "@/lib/fetchers";
 import { Note } from "@prisma/client";
-import { useMemo, useRef, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import useSWR from "swr"
 
 export default function NotesView() {
@@ -24,7 +24,11 @@ export default function NotesView() {
       .sort((a, b) => a.title.localeCompare(b.title));
   }, [data]);
 
-  const addNote = async () => {
+  const addNote = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const target = e.currentTarget;
+
     const title = titleRef.current?.value
     const notes = data?.notes
     const ownerId = userData?.user?.id
@@ -50,6 +54,9 @@ export default function NotesView() {
     });
 
     mutate()
+
+    if (target)
+      target.reset();
   }
 
   const onEdit = async (note: Note) => {
@@ -102,7 +109,7 @@ export default function NotesView() {
   return (
     <div className="relative grow w-full">
       <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${editingNote ? "blur-sm" : ""}`}>
-        <div className="flex flex-col justify-between gap-4">
+        <form onSubmit={addNote} className="flex flex-col justify-between gap-4">
           <CustomInput
             placeholder="New note title"
             ref={titleRef}
@@ -114,12 +121,12 @@ export default function NotesView() {
             />
 
             <CustomButton
-              onClick={addNote}
+              type="submit"
             >
               Add note
             </CustomButton>
           </div>
-        </div>
+        </form>
 
         {sortedNotes && sortedNotes.map((n, key) =>
           <NoteCard
@@ -257,6 +264,7 @@ function PrivateButton({ isPublic, setIsPublic }: { isPublic: Boolean, setIsPubl
     <CustomButton
       className="min-w-[8rem] flex"
       onClick={() => setIsPublic(!isPublic)}
+      type="button"
     >
       <MaterialIcon className="align-middle flex">
         {isPublic ? "visibility" : "visibility_off"}
