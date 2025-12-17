@@ -22,8 +22,11 @@ model User {
   passwordHash String
   perms        String[] @default([])
 
-  sessionInvalidated Boolean @default(false)
+  sessionInvalidated Boolean     @default(false)
   notes              Note[]
+  workHours          WorkHours[]
+
+  apiKeyHash String? @unique
 }
 
 model Note {
@@ -36,4 +39,16 @@ model Note {
   title String
   text  String  @default("")
   done  Boolean @default(false)
+}
+
+model WorkHours {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  date    DateTime
+  seconds Float
+
+  @@unique([userId, date])
 }
