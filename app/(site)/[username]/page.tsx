@@ -7,6 +7,7 @@ import ApiKeyRetriever from "./ApiKeyRetriever";
 import { getIronSession } from "iron-session";
 import { SessionData, sessionOptions } from "@/lib/session";
 import { cookies } from "next/headers";
+import { Perm } from "@/lib/perms";
 
 
 export default async function Profile({ params }: { params: Promise<{ username: string }> }) {
@@ -16,8 +17,15 @@ export default async function Profile({ params }: { params: Promise<{ username: 
   const decoded = decodeURIComponent(slug);
   const username = decoded.replace("@", '');
 
-  const user = await prisma.user.findUnique({ where: { username }, select: { username: true } });
-  if (!user) return "user not found";
+  // TODO: we dont need to pull all that i guess??
+  const dbUser = await prisma.user.findUnique({ where: { username }, select: { username: true, id: true, perms: true } });
+  if (!dbUser) return "user not found";
+
+  const user: UserDTO = {
+    id: dbUser.id,
+    username: dbUser.username,
+    perms: dbUser.perms as Perm[],
+  }
 
   const session = await getIronSession<SessionData>((await cookies()), sessionOptions);
   const isOwner = Boolean(session.user?.username === username);
