@@ -169,7 +169,7 @@ function Day({
     >
       {day ?? ""}
       {workDone &&
-        <div className={`absolute text-sm -top-2 right-0 ${isToday ? "text-on-primary" : "text-outline"}`}>
+        <div className={`absolute text-sm -top-2 right-0 text-outline`}>
           .
         </div>
       }
