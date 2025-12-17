@@ -99,15 +99,20 @@ export default function Calendar({ username }: { username: string }) {
 
 
   return (
-    <div className="flex flex-col grow select-none">
+    <div className="flex flex-col grow select-none gap-1">
       {/* header */}
       <div className="flex flex-row items-center justify-between">
-        <button onClick={onPrev}>{"<"}</button>
-        <span className="font-bold">{`${date.month + 1} ${date.year}`}</span>
-        <button onClick={onNext}>{">"}</button>
+        <button onClick={onPrev} className="min-w-6 cursor-pointer">{"<"}</button>
+        <span className="font-bold">{
+          new Date(Date.UTC(date.year, date.month)).toLocaleString(
+            "en",
+            { month: "long", year: "numeric" }
+          )
+        }</span>
+        <button onClick={onNext} className="min-w-6 cursor-pointer">{">"}</button>
       </div>
       {/* weekdays */}
-      <div className="grid grid-cols-7 text-center">
+      <div className="grid grid-cols-7 text-center gap-y-1">
         {WEEKDAYS.map(d => (
           <div key={d} className="text-secondary">{d}</div>
         ))}
@@ -136,9 +141,11 @@ export default function Calendar({ username }: { username: string }) {
         })}
       </div>
 
-      <div className="flex grow w-full justify-around items-center">
-        <span>{hoursOnSelectedDay ?? "BALLS"}</span>
-      </div>
+      {hoursOnSelectedDay &&
+        <span className="font-semibold text-outline">
+          {"Worked for: " + hoursOnSelectedDay}
+        </span>
+      }
     </div>
   )
 }
@@ -157,7 +164,7 @@ function Day({
   workDone: boolean,
 }) {
   return (
-    <div className={`relative ${isToday ? "text-on-primary bg-primary" : ""} ${isSelected ? "underline font-bold" : ""} rounded-sm`}
+    <div className={`relative ${isSelected ? "text-on-secondary bg-secondary" : ""} ${isToday ? "outline-2 outline-tertiary" : ""} rounded-sm`}
       onClick={() => onClick(day)}
     >
       {day ?? ""}
