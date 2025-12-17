@@ -138,7 +138,7 @@ export default function NotesView() {
       </div>
 
       {editingNote &&
-        <div className="absolute p-4 md:px-8 w-full h-full top-0 left-0" >
+        <div className="absolute p-1 md:p-4 md:px-8 w-full h-full top-0 left-0" >
           <NoteModal
             note={editingNote}
             onSendEdit={onSendEdit}
@@ -176,7 +176,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
   }
 
   return (
-    <div className="flex flex-col grow gap-4 p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
+    <div className="flex flex-col grow gap-4 p-2 md:p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
 
       <div className="flex flex-row gap-1 md:4 text-xl">
         <button onClick={() => setDone(!done)}>
