@@ -151,8 +151,8 @@ export default function NotesView() {
 }
 
 function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit: any, onSendEdit: any }) {
-  const [initialTitle, setInitialTitle] = useState(note.title);
-  const [initialText, setInitialText] = useState(note.text ?? "");
+  const [initialTitle] = useState(note.title);
+  const [initialText] = useState(note.text ?? "");
   const titleRef = useRef<HTMLInputElement | null>(null);
   const textRef = useRef<HTMLTextAreaElement | null>(null);
   const [done, setDone] = useState(note.done);
