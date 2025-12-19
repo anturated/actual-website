@@ -176,7 +176,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
   }
 
   return (
-    <div className="flex flex-col grow gap-4 p-2 md:p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
+    <div className="flex flex-col grow gap-2 md:gap-4 p-2 md:p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
 
       <div className="flex flex-row gap-1 md:4 text-xl">
         <button onClick={() => setDone(!done)}>
@@ -186,7 +186,7 @@ function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit:
         </button>
 
         <input
-          className="grow hover:underline focus:hover:no-underline decoration-outline outline-none p-3 rounded-lg focus:bg-surface-container-high min-w-0"
+          className="grow hover:underline focus:hover:no-underline decoration-outline outline-none p-2 md:p-3 rounded-lg focus:bg-surface-container-high min-w-0"
           placeholder="Title"
           ref={titleRef}
           defaultValue={initialTitle}
