@@ -15,18 +15,45 @@ export interface UserResponse {
 }
 
 export async function GET(req: NextRequest) {
-  let res: UsersResponse;
+  let res: UsersResponse | UserResponse;
 
   try {
-    // TODO: ccheck perms?
-    const users = await prisma.user.findMany();
+    const id = req.nextUrl.searchParams.get("i");
+    const username = req.nextUrl.searchParams.get("u");
 
-    res = {
-      users: users.map(u => ({
-        id: u.id,
-        perms: u.perms as Perm[],
-        username: u.username
-      }))
+    if (username) {
+      const user = await prisma.user.findUnique({ where: { username } });
+      if (!user) throw "User not found";
+
+      res = {
+        user: {
+          id: user.id,
+          username: user.username,
+          perms: user.perms as Perm[]
+        }
+      }
+    } else if (id) {
+      const user = await prisma.user.findUnique({ where: { id } });
+      if (!user) throw "User not found";
+
+      res = {
+        user: {
+          id: user.id,
+          username: user.username,
+          perms: user.perms as Perm[]
+        }
+      }
+    } else {
+
+      const users = await prisma.user.findMany();
+
+      res = {
+        users: users.map(u => ({
+          id: u.id,
+          perms: u.perms as Perm[],
+          username: u.username
+        }))
+      }
     }
   } catch (e) {
     res = { error: String(e) }

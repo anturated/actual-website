@@ -21,6 +21,8 @@ model User {
   username     String   @unique
   passwordHash String
   perms        String[] @default([])
+  avatar       Avatar?
+  description  String?
 
   sessionInvalidated Boolean     @default(false)
   notes              Note[]
@@ -65,4 +67,12 @@ model BlogPost {
 
   created DateTime @default(now())
   updated DateTime @default(now())
+}
+
+model Avatar {
+  id       String @id @default(uuid())
+  mimeType String
+  data     Bytes
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
