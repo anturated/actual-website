@@ -1,4 +1,5 @@
 import { UserDTO } from "@/data/user-dto";
+import { dbGetUserCredentials } from "@/lib/credentials";
 import { Perm } from "@/lib/perms";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
@@ -66,9 +67,20 @@ export async function PATCH(req: NextRequest) {
   let res: UserResponse;
 
   try {
-    const { id, perms, username } = await req.json();
+    const { id, perms, username, apiKey } = await req.json();
+    const sessionUser = await dbGetUserCredentials(apiKey);
 
-    const user = await prisma.user.update({ where: { id }, data: { perms, username, sessionInvalidated: true } })
+    if (username !== sessionUser?.username || !sessionUser?.perms.includes("admin")) throw "Invalid user";
+    if (perms && !sessionUser.perms.includes("admin")) throw "Can't edit perms";
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        perms,
+        username,
+        sessionInvalidated: true
+      }
+    })
 
     res = {
       user: {
