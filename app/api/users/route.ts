@@ -30,7 +30,8 @@ export async function GET(req: NextRequest) {
         user: {
           id: user.id,
           username: user.username,
-          perms: user.perms as Perm[]
+          perms: user.perms as Perm[],
+          description: user.description ?? undefined
         }
       }
     } else if (id) {
@@ -67,10 +68,12 @@ export async function PATCH(req: NextRequest) {
   let res: UserResponse;
 
   try {
-    const { id, perms, username, apiKey } = await req.json();
+    const { id, perms, username, description, apiKey } = await req.json();
     const sessionUser = await dbGetUserCredentials(apiKey);
 
-    if (username !== sessionUser?.username || !sessionUser?.perms.includes("admin")) throw "Invalid user";
+    if (!sessionUser) throw "Unauthorised";
+
+    if (id !== sessionUser.id && !sessionUser.perms.includes("admin")) throw "Invalid user";
     if (perms && !sessionUser.perms.includes("admin")) throw "Can't edit perms";
 
     const user = await prisma.user.update({
@@ -78,6 +81,7 @@ export async function PATCH(req: NextRequest) {
       data: {
         perms,
         username,
+        description,
         sessionInvalidated: true
       }
     })

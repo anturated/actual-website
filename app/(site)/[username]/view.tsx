@@ -4,7 +4,7 @@ import { UserDTO } from "@/data/user-dto";
 import Calendar from "./calendar";
 import ApiKeyRetriever from "./ApiKeyRetriever";
 import { CustomButton } from "@/components/CustomButton";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import { meFetcher, userFetcher } from "@/lib/fetchers";
 import Image from "next/image";
@@ -13,7 +13,8 @@ import { MaterialIcon } from "@/components/MaterialIcon";
 
 export default function ProfileView({ username }: { username: string }) {
 
-  const { data } = useSWR(`/api/users?u=${username}`, userFetcher);
+  const { data, mutate } = useSWR(`/api/users?u=${username}`, userFetcher);
+
   const { data: meData } = useSWR("/api/me", meFetcher);
   const isOwner = useMemo(() => {
     if (!data?.user || !meData?.user) return false;
@@ -36,6 +37,32 @@ export default function ProfileView({ username }: { username: string }) {
     target.reset();
   }
 
+  const onSave = async (username: string, description: string): Promise<Boolean> => {
+    if (!username || !data?.user) return false;
+
+    const newUsername = username === data?.user?.username ? undefined : username;
+    const newDescription = (!description || description === data?.user?.description) ? undefined : description;
+
+    if (!newUsername && !newDescription) return false;
+
+    const res = await fetch("/api/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: data.user.id,
+        username: newUsername,
+        description: newDescription,
+      })
+    })
+
+    const response = await res.json()
+
+    if (!res.ok || response.error) { console.log(response.error); return false; }
+
+    mutate();
+    return true;
+  }
+
   return (
     // idk if i like this
     <div className="w-full">
@@ -43,7 +70,7 @@ export default function ProfileView({ username }: { username: string }) {
       {/* prifile + calendar */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         {/* pfp + text info */}
-        <UserDisplay username={username} user={data?.user} />
+        <UserDisplay username={username} user={data?.user} isOwner={isOwner} onSave={onSave} />
 
         {data?.user &&
           <Calendar username={data.user.username} />
@@ -66,8 +93,25 @@ export default function ProfileView({ username }: { username: string }) {
   )
 }
 
-function UserDisplay({ username, user }: { username: string, user?: UserDTO }) {
+function UserDisplay({ username, user, isOwner, onSave }: { username: string, user?: UserDTO, isOwner: Boolean, onSave: any }) {
   const [hasAvatar, setHasAvatar] = useState(true);
+  const [editing, setEditing] = useState(false);
+
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const onSubmitEdits = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const name = nameRef.current?.value;
+    const description = textRef.current?.value;
+
+    if (!name) return;
+
+    const res = await onSave(name, description);
+
+    if (res) setEditing(false);
+  }
 
   return (
     <div className="flex flex-row gap-4 md:gap-8 max-w-4xl w-full">
@@ -88,11 +132,40 @@ function UserDisplay({ username, user }: { username: string, user?: UserDTO }) {
 
       </div>
 
-      <div className="flow flex-col gap-8 ">
-        <p className="font-bold text-xl md:text-3xl">{username}</p>
-        <p className="italic text-xs md:text-sm text-wrap">
-          Description placeholder
-        </p>
+      <div className="flow flex-col gap-8 grow">
+        {!editing && <>
+          <p className="font-bold text-xl md:text-3xl">{username}</p>
+          {user?.description &&
+            <p className="italic text-xs md:text-sm text-wrap">
+              {user.description}
+            </p>
+          }
+          {isOwner &&
+            <CustomButton onClick={() => setEditing(true)}>Edit info</CustomButton>
+          }
+        </>}
+
+        {editing && user &&
+          <form
+            className="flex flex-col gap-1 h-full"
+            onSubmit={onSubmitEdits}>
+            <input
+              className="bg-surface-container rounded-lg font-bold text-xl md:text-3xl"
+              ref={nameRef}
+              defaultValue={user.username}
+            />
+            <textarea
+              className="grow resize-none italic text-xs md:text-sm text-wrap bg-surface-container rounded-lg"
+              defaultValue={user.description}
+              ref={textRef}
+            />
+            <div className="flex flex-row gap-4">
+              <CustomButton type="submit">Save</CustomButton>
+              <CustomButton type="button" onClick={() => setEditing(false)}>Cancel</CustomButton>
+            </div>
+          </form>
+        }
+
 
       </div>
     </div>
