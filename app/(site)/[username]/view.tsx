@@ -4,7 +4,7 @@ import { UserDTO } from "@/data/user-dto";
 import Calendar from "./calendar";
 import ApiKeyRetriever from "./ApiKeyRetriever";
 import { CustomButton } from "@/components/CustomButton";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import useSWR from "swr";
 import { meFetcher, userFetcher } from "@/lib/fetchers";
 import Image from "next/image";
@@ -19,9 +19,6 @@ export default function ProfileView({ username }: { username: string }) {
     if (!data?.user || !meData?.user) return false;
     return data.user.username === meData.user.username;
   }, [data, meData])
-
-  const avatarRef = useRef<HTMLInputElement | null>(null);
-  const formRef = useRef<HTMLFormElement | null>(null);
 
   const onSubmitAvatar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,7 +54,7 @@ export default function ProfileView({ username }: { username: string }) {
         <>
           <ApiKeyRetriever />
           <form onSubmit={onSubmitAvatar} method="POST" encType="multipart/form-data">
-            <input type="file" name="avatar" ref={avatarRef}
+            <input type="file" name="avatar"
               className="bg-surface-bright"
             />
             <CustomButton>Save avatar</CustomButton>
