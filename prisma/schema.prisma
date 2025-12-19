@@ -26,7 +26,8 @@ model User {
   notes              Note[]
   workHours          WorkHours[]
 
-  apiKeyHash String? @unique
+  apiKeyHash String?    @unique
+  blogPosts  BlogPost[]
 }
 
 model Note {
@@ -51,4 +52,17 @@ model WorkHours {
   seconds Float
 
   @@unique([userId, date])
+}
+
+model BlogPost {
+  id String @id @default(uuid())
+
+  title String
+  text  String?
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  created DateTime @default(now())
+  updated DateTime @default(now())
 }
