@@ -2,7 +2,7 @@ import { MaterialIcon } from "@/components/MaterialIcon";
 import { Note } from "@prisma/client";
 import { useState } from "react";
 
-export default function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdit: any, onDelete: any }) {
+export default function NoteCard({ data, onEdit, onDelete, loggedIn }: { data: Note, onEdit: any, onDelete: any, loggedIn: boolean }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -32,9 +32,11 @@ export default function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdi
         <button onClick={() => onEdit(data)}>
           <MaterialIcon className="text-secondary md:text-secondary-container hover:text-secondary cursor-pointer">edit</MaterialIcon>
         </button>
-        <button onClick={() => onDelete(data)}>
-          <MaterialIcon className="text-error md:text-error-container hover:text-error cursor-pointer">delete</MaterialIcon>
-        </button>
+        {loggedIn &&
+          <button onClick={() => onDelete(data)}>
+            <MaterialIcon className="text-error md:text-error-container hover:text-error cursor-pointer">delete</MaterialIcon>
+          </button>
+        }
       </div>}
     </div >
   )

@@ -17,15 +17,13 @@ export default function ToolsView() {
         description="Generate troll"
       />
 
-      {data?.user && <>
-        {permsAllow("/tools/notes", data.user.perms) &&
-          <Tool
-            title="Notes"
-            description="View notes"
-            href="/tools/notes"
-          />
-        }
+      <Tool
+        title="Notes"
+        description="View notes"
+        href="/tools/notes"
+      />
 
+      {data?.user && <>
         {permsAllow("/tools/edit-users", data.user.perms) &&
           <Tool
             title="Edit users"

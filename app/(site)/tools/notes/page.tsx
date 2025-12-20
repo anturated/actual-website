@@ -111,41 +111,50 @@ export default function NotesView() {
 
   return (
     <div className="relative grow w-full">
+
       <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${editingNote ? "blur-sm" : ""}`}>
-        <form onSubmit={addNote} className="flex flex-col justify-between gap-4">
-          <CustomInput
-            placeholder="New note title"
-            ref={titleRef}
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <PrivateButton
-              isPublic={isPublic}
-              setIsPublic={setIsPublic}
+
+        {/* send note form */}
+        {userData?.user &&
+          <form onSubmit={addNote} className="flex flex-col justify-between gap-4">
+            <CustomInput
+              placeholder="New note title"
+              ref={titleRef}
             />
+            <div className="grid grid-cols-2 gap-4">
+              <PrivateButton
+                isPublic={isPublic}
+                setIsPublic={setIsPublic}
+              />
 
-            <CustomButton
-              type="submit"
-            >
-              Add note
-            </CustomButton>
-          </div>
-        </form>
+              <CustomButton
+                type="submit"
+              >
+                Add note
+              </CustomButton>
+            </div>
+          </form>
+        }
 
-        {sortedNotes && sortedNotes.map((n, key) =>
+        {/* the rest of the notes */}
+        {sortedNotes && sortedNotes.map(n =>
           <NoteCard
-            data={n} key={key}
+            data={n} key={n.id}
             onEdit={onEdit}
             onDelete={onDelete}
+            loggedIn={Boolean(userData?.user)}
           />
         )}
       </div>
 
+      {/* modal */}
       {editingNote &&
         <div className="absolute p-1 md:p-4 md:px-8 w-full h-full top-0 left-0" >
           <NoteModal
             note={editingNote}
             onSendEdit={onSendEdit}
             onCloseEdit={onCloseEdit}
+            loggedIn={Boolean(userData?.user)}
           />
         </div>
       }
