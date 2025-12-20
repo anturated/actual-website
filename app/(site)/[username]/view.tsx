@@ -65,7 +65,7 @@ export default function ProfileView({ username }: { username: string }) {
 
   return (
     // idk if i like this
-    <div className="w-full">
+    <div className="flex flex-col gap-8 w-full">
 
       {/* prifile + calendar */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
@@ -115,6 +115,7 @@ function UserDisplay({ username, user, isOwner, onSave }: { username: string, us
 
   return (
     <div className="flex flex-row gap-4 md:gap-8 max-w-4xl w-full">
+      {/* avatar container */}
       <div className="flex justify-around relative rounded-4xl overflow-hidden items-center w-[128px] md:w-[256px] h-[128px] md:h-[256px] bg-surface-bright">
         {user && hasAvatar &&
           <Image
@@ -132,40 +133,54 @@ function UserDisplay({ username, user, isOwner, onSave }: { username: string, us
 
       </div>
 
+      {/* username & desc */}
       <div className="flow flex-col gap-8 grow">
-        {!editing && <>
-          <p className="font-bold text-xl md:text-3xl">{username}</p>
-          {user?.description &&
-            <p className="italic text-xs md:text-sm text-wrap">
-              {user.description}
-            </p>
-          }
-          {isOwner &&
-            <CustomButton onClick={() => setEditing(true)}>Edit info</CustomButton>
-          }
-        </>}
+        {/* display current */}
+        {!editing &&
+          <div className="flex flex-col gap-1 justify-start h-full">
+            <p className="font-bold text-xl md:text-3xl">{username}</p>
 
+            {user?.description &&
+              <p className="italic text-xs md:text-sm text-wrap">
+                {user.description}
+              </p>
+            }
+
+            {isOwner &&
+              <CustomButton
+                className="mt-auto"
+                onClick={() => setEditing(true)}
+              >
+                Edit info
+              </CustomButton>
+            }
+          </div>
+        }
+
+        {/* editor */}
         {editing && user &&
           <form
-            className="flex flex-col gap-1 h-full"
-            onSubmit={onSubmitEdits}>
+            className="flex flex-col gap-1 h-full max-w-[176px]"
+            onSubmit={onSubmitEdits}
+          >
             <input
               className="bg-surface-container rounded-lg font-bold text-xl md:text-3xl"
               ref={nameRef}
               defaultValue={user.username}
             />
+
             <textarea
               className="grow resize-none italic text-xs md:text-sm text-wrap bg-surface-container rounded-lg"
               defaultValue={user.description}
               ref={textRef}
             />
+
             <div className="flex flex-row gap-4">
               <CustomButton type="submit">Save</CustomButton>
               <CustomButton type="button" onClick={() => setEditing(false)}>Cancel</CustomButton>
             </div>
           </form>
         }
-
 
       </div>
     </div>
