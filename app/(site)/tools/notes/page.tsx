@@ -7,6 +7,9 @@ import { meFetcher, notesFetcher } from "@/lib/fetchers";
 import { Note } from "@prisma/client";
 import { FormEvent, useMemo, useRef, useState } from "react";
 import useSWR from "swr"
+import NoteModal from "./NoteModal";
+import NoteCard from "./NoteCard";
+
 
 export default function NotesView() {
   const { data, mutate } = useSWR('/api/notes', notesFetcher);
@@ -150,116 +153,7 @@ export default function NotesView() {
   )
 }
 
-function NoteModal({ note, onSendEdit, onCloseEdit }: { note: Note, onCloseEdit: any, onSendEdit: any }) {
-  const [initialTitle] = useState(note.title);
-  const [initialText] = useState(note.text ?? "");
-  const titleRef = useRef<HTMLInputElement | null>(null);
-  const textRef = useRef<HTMLTextAreaElement | null>(null);
-  const [done, setDone] = useState(note.done);
-  const [isPublic, setIsPublic] = useState(note.isPublic);
-
-  const onSave = () => {
-    const title = titleRef.current?.value;
-    const text = textRef.current?.value ?? "";
-
-    if (!title) return;
-
-    const newNote: Note = {
-      ...note,
-      title,
-      text,
-      done,
-      isPublic,
-    }
-
-    onSendEdit(newNote);
-  }
-
-  return (
-    <div className="flex flex-col grow gap-2 md:gap-4 p-2 md:p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
-
-      <div className="flex flex-row gap-1 md:4 text-xl">
-        <button onClick={() => setDone(!done)}>
-          <MaterialIcon>
-            {done ? "check_box" : "check_box_outline_blank"}
-          </MaterialIcon>
-        </button>
-
-        <input
-          className="grow hover:underline focus:hover:no-underline decoration-outline outline-none p-2 md:p-3 rounded-lg focus:bg-surface-container-high min-w-0"
-          placeholder="Title"
-          ref={titleRef}
-          defaultValue={initialTitle}
-        />
-        <button
-          className="text-error md:text-on-surface hover:text-error cursor-pointer"
-          onClick={onCloseEdit}
-        >
-          <MaterialIcon>
-            close
-          </MaterialIcon>
-        </button>
-      </div>
-
-      <textarea
-        className="resize-none min-h-70 h-full p-3 outline-none border-2 border-outline-variant focus:border-outline rounded-lg"
-        placeholder="Note text"
-        ref={textRef}
-        defaultValue={initialText}
-      />
-
-      <div className="flex flex-row justify-between md:justify-end gap-3">
-        <PrivateButton
-          isPublic={isPublic}
-          setIsPublic={setIsPublic}
-        />
-        <CustomButton onClick={onSave} className="px-8">
-          Save
-        </CustomButton>
-      </div>
-    </div>
-  )
-}
-
-function NoteCard({ data, onEdit, onDelete }: { data: Note, onEdit: any, onDelete: any }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      className={`
-        flex items-center justify-around relative
-        outline-2 outline-outline-variant bg-surface-container
-        text-on-surface text-sm
-        rounded-lg h-28
-      `}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <p className="text-outline blur-sm outline-surface-container-low max-h-28 text-wrap overflow-hidden select-none">
-        {data.text}
-      </p>
-
-      <p className="absolute top-0 left-0 m-2 text-wrap">
-        {data.title}
-      </p>
-
-      <MaterialIcon className="absolute bottom-0 left-0 m-2 text-outline">
-        {data.isPublic ? "visibility" : "visibility_off"}
-      </MaterialIcon>
-
-      {hovered && <div className="flex flex-row text-sm absolute right-0 top-0 m-2 gap-2">
-        <button onClick={() => onEdit(data)}>
-          <MaterialIcon className="text-secondary md:text-secondary-container hover:text-secondary cursor-pointer">edit</MaterialIcon>
-        </button>
-        <button onClick={() => onDelete(data)}>
-          <MaterialIcon className="text-error md:text-error-container hover:text-error cursor-pointer">delete</MaterialIcon>
-        </button>
-      </div>}
-    </div >
-  )
-}
-
-function PrivateButton({ isPublic, setIsPublic }: { isPublic: Boolean, setIsPublic: any }) {
+export function PrivateButton({ isPublic, setIsPublic }: { isPublic: Boolean, setIsPublic: any }) {
   return (
     <CustomButton
       className="min-w-[8rem] flex"
