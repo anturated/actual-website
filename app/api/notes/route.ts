@@ -1,3 +1,4 @@
+import { dbGetUserCredentials } from "@/lib/credentials";
 import { prisma } from "@/lib/prisma";
 import { SessionData, sessionOptions } from "@/lib/session";
 import { Note } from "@prisma/client";
@@ -41,7 +42,11 @@ export async function PUT(req: NextRequest) {
   let res: NoteResponse;
 
   try {
-    const { ownerId, done, title, isPublic, ...rest } = await req.json();
+    const { ownerId, done, title, isPublic, apiKey, ...rest } = await req.json();
+    const userData = await dbGetUserCredentials(apiKey);
+
+    // check if owner is correct
+    if (userData?.id !== ownerId && !userData?.perms.includes("admin")) throw "Unauthorized";
 
     const note = await prisma.note.create({
       data: {
@@ -63,7 +68,18 @@ export async function PATCH(req: NextRequest) {
 
   try {
 
-    const { id, ...rest } = await req.json();
+    const { id, ownerId, apiKey, ...rest } = await req.json();
+    const userData = await dbGetUserCredentials(apiKey);
+    if (!userData) throw "Not logged in"
+
+    // check if owner is correct
+    if (userData.id !== ownerId && !userData.perms.includes("admin")) throw userData.id + " " + ownerId;
+
+    // check if user can edit this note
+    const oldNote = await prisma.note.findUnique({ where: { id } });
+    if (!oldNote) throw "Note not found";
+
+    if (oldNote.ownerId !== userData.id && !oldNote.isPublic && !userData.perms.includes("admin")) throw "Unauthorized"
 
     const note = await prisma.note.update({
       where: { id },
