@@ -99,7 +99,7 @@ export default function Calendar({ username }: { username: string }) {
 
 
   return (
-    <div className="flex flex-col grow select-none gap-1">
+    <div className="flex flex-col grow select-none gap-1 min-h-56">
       {/* header */}
       <div className="flex flex-row items-center justify-between">
         <button onClick={onPrev} className="min-w-6 cursor-pointer">{"<"}</button>
