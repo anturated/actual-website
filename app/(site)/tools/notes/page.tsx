@@ -75,13 +75,14 @@ export default function NotesView() {
     const ownerId = userData?.user?.id
 
     if (!notes || !ownerId) return;
+    const newNote = { ...note, ownerId };
 
-    mutate({ notes: notes.map(n => n.id === note.id ? { ...note, ownerId } : n) }, false);
+    mutate({ notes: notes.map(n => n.id === note.id ? newNote : n) }, false);
 
     await fetch("/api/notes", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(note)
+      body: JSON.stringify(newNote)
     })
 
     await mutate()
