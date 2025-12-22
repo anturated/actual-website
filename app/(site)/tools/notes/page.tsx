@@ -163,17 +163,17 @@ export default function NotesView() {
   )
 }
 
-export function PrivateButton({ isPublic, setIsPublic }: { isPublic: Boolean, setIsPublic: any }) {
+export function PrivateButton({ isPublic, setIsPublic, small = false }: { isPublic: Boolean, setIsPublic: any, small?: boolean }) {
   return (
     <CustomButton
-      className="min-w-[8rem] flex"
+      className={`${small ? "min-w-auto md:min-w-[9rem]" : "min-w-[9rem]"} flex`}
       onClick={() => setIsPublic(!isPublic)}
       type="button"
     >
       <MaterialIcon className="align-middle flex">
         {isPublic ? "visibility" : "visibility_off"}
       </MaterialIcon>
-      <span className="flex-1 align-middle justify-around">{isPublic ? " Public" : " Private"}</span>
+      <span className={`${small ? "hidden md:flex-1 md:flex" : "flex-1"} align-middle justify-around`}>{isPublic ? " Public" : " Private"}</span>
     </CustomButton>
   )
 }

@@ -96,6 +96,7 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
               setIsPublic(v);
               debounceSave({ isPublic: v });
             }}
+            small={true}
           />
         }
         <button
