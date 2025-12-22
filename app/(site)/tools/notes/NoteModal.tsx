@@ -12,6 +12,13 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
   const [done, setDone] = useState(note.done);
   const [isPublic, setIsPublic] = useState(note.isPublic);
 
+  const editTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const clearTimer = () => {
+    if (!editTimerRef.current) return;
+    clearTimeout(editTimerRef.current);
+    editTimerRef.current = null;
+  }
+
   const onSave = () => {
     const title = titleRef.current?.value;
     const text = textRef.current?.value ?? "";
@@ -27,6 +34,34 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
     }
 
     onSendEdit(newNote);
+    onCloseEdit();
+  }
+
+  const debounceSave = (override?: Partial<Note>) => {
+    clearTimer();
+
+    editTimerRef.current = setTimeout(async () => {
+      const title = titleRef.current?.value;
+      const text = textRef.current?.value ?? "";
+
+      if (!title) return;
+
+      const newNote: Note = {
+        ...note,
+        title,
+        text,
+        done,
+        isPublic,
+        ...override
+      }
+
+      await onSendEdit(newNote);
+    }, 1000);
+  }
+
+  const onDone = () => {
+    setDone(d => !d);
+    debounceSave();
   }
 
   return (
@@ -34,7 +69,11 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
 
       <div className="flex flex-row gap-1 md:4 text-xl">
         <button
-          onClick={() => setDone(!done)}
+          onClick={() => {
+            const newDone = !done;
+            debounceSave({ done: newDone })
+            setDone(newDone)
+          }}
           disabled={!loggedIn}
         >
           <MaterialIcon>
@@ -48,10 +87,20 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
           ref={titleRef}
           defaultValue={initialTitle}
           disabled={!loggedIn}
+          onChange={() => debounceSave()}
         />
+        {loggedIn &&
+          <PrivateButton
+            isPublic={isPublic}
+            setIsPublic={(v: boolean) => {
+              setIsPublic(v);
+              debounceSave({ isPublic: v });
+            }}
+          />
+        }
         <button
-          className="text-error md:text-on-surface hover:text-error cursor-pointer"
-          onClick={onCloseEdit}
+          className="text-error md:text-on-surface hover:text-error cursor-pointer min-w-10"
+          onClick={onSave}
         >
           <MaterialIcon>
             close
@@ -65,18 +114,8 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
         ref={textRef}
         defaultValue={initialText}
         disabled={!loggedIn}
+        onChange={() => debounceSave()}
       />
-      {loggedIn &&
-        <div className="flex flex-row justify-between md:justify-end gap-3">
-          <PrivateButton
-            isPublic={isPublic}
-            setIsPublic={setIsPublic}
-          />
-          <CustomButton onClick={onSave} className="px-8">
-            Save
-          </CustomButton>
-        </div>
-      }
     </div >
   )
 }
