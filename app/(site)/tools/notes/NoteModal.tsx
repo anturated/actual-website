@@ -59,11 +59,6 @@ export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: {
     }, 1000);
   }
 
-  const onDone = () => {
-    setDone(d => !d);
-    debounceSave();
-  }
-
   return (
     <div className="flex flex-col grow gap-2 md:gap-4 p-2 md:p-4 rounded-2xl bg-surface-container outline-2 outline-outline w-full h-full" >
 
