@@ -5,11 +5,11 @@ import { CustomInput } from "@/components/CustomInput";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { meFetcher, notesFetcher } from "@/lib/fetchers";
 import { Note } from "@prisma/client";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr"
 import NoteModal from "./NoteModal";
 import NoteCard from "./NoteCard";
-import { notFound, useParams, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { NoteResponse } from "@/app/api/notes/route";
 
 
@@ -17,7 +17,7 @@ export default function NotesView() {
   const router = useRouter();
   const params = useParams<{ slug?: string }>();
 
-  const { data, mutate } = useSWR('/api/notes', notesFetcher);
+  const { data, isLoading, mutate } = useSWR('/api/notes', notesFetcher);
   const { data: userData } = useSWR('/api/me', meFetcher);
 
   const titleRef = useRef<HTMLInputElement | null>(null);
@@ -26,7 +26,11 @@ export default function NotesView() {
   const editingSlug = params?.slug;
   const editingNote = data?.notes?.find(n => n.slug === editingSlug);
 
-  if (editingSlug && !editingNote) notFound(); // TODO: redirectback to /notes
+  useEffect(() => {
+    if (!editingSlug || isLoading) return;
+    if (!editingNote)
+      router.replace("/tools/notes");
+  }, [isLoading, editingSlug, editingNote, router])
 
   const sortedNotes = useMemo(() => {
     if (!data?.notes) return null;
