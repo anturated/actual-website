@@ -51,9 +51,9 @@ export async function PUT(req: NextRequest) {
 
     const note = await prisma.note.create({
       data: {
+        ...rest,
         ownerId, done, title, isPublic,
         slug: generateUniqueSlug(title),
-        ...rest
       }
     });
 
