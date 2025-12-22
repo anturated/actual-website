@@ -38,6 +38,7 @@ model Note {
   owner    User    @relation(fields: [ownerId], references: [id])
   ownerId  String
   isPublic Boolean
+  slug     String  @unique
 
   title String
   text  String  @default("")
@@ -61,12 +62,13 @@ model BlogPost {
 
   title String
   text  String?
+  slug  String  @unique
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
   created DateTime @default(now())
-  updated DateTime @default(now())
+  updated DateTime @updatedAt
 }
 
 model Avatar {

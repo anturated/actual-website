@@ -1,4 +1,4 @@
-import NotesView from "./view";
+import NotesView from "../view";
 
 export default function NotePage() {
   return <NotesView />

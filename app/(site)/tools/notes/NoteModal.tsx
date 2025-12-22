@@ -2,7 +2,7 @@ import { CustomButton } from "@/components/CustomButton";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { Note } from "@prisma/client";
 import { useRef, useState } from "react";
-import { PrivateButton } from "./page";
+import { PrivateButton } from "./view";
 
 export default function NoteModal({ note, onSendEdit, onCloseEdit, loggedIn }: { note: Note, onCloseEdit: any, onSendEdit: any, loggedIn: Boolean }) {
   const [initialTitle] = useState(note.title);

@@ -3,6 +3,7 @@
 import { BlogPostWithUser } from "@/app/api/blog/route";
 import { CustomButton } from "@/components/CustomButton";
 import { meFetcher, postsFetcher } from "@/lib/fetchers"
+import Link from "next/link";
 import { FormEvent, useRef } from "react";
 import useSWR from "swr"
 
@@ -20,7 +21,8 @@ export default function Tools() {
       userId: userData.user?.id,
       created: new Date(),
       updated: new Date(),
-      user: { id: userData.user.id, username: userData.user.username }
+      user: { id: userData.user.id, username: userData.user.username },
+      slug: "", // TODO: no need to pass slug, figure out later
     }
 
     mutate({ posts: [...data.posts, post] }, false)
@@ -52,11 +54,11 @@ export default function Tools() {
 
 function Post({ post, userId }: { post: BlogPostWithUser, userId?: string }) {
   return (
-    <div className="flex flex-col gap-2 bg-surface-container-high rounded-2xl p-2">
+    <Link href={`/blog/${post.slug}`} className="flex flex-col gap-2 bg-surface-container-high rounded-2xl p-2">
       <p className="text-lg font-semibold">{post.title}</p>
       <p className="text-sm text-outline -mt-2">by {post.user.username}</p>
       <p>{post.text}</p>
-    </div>
+    </Link>
   )
 }
 

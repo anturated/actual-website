@@ -1,6 +1,7 @@
 import { dbGetUserCredentials } from "@/lib/credentials";
 import { prisma } from "@/lib/prisma";
 import { SessionData, sessionOptions } from "@/lib/session";
+import { generateUniqueSlug } from "@/lib/slugs";
 import { Note } from "@prisma/client";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -51,6 +52,7 @@ export async function PUT(req: NextRequest) {
     const note = await prisma.note.create({
       data: {
         ownerId, done, title, isPublic,
+        slug: generateUniqueSlug(title),
         ...rest
       }
     });

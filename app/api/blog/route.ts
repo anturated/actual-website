@@ -1,5 +1,6 @@
 import { dbGetUserCredentials } from "@/lib/credentials";
 import { prisma } from "@/lib/prisma";
+import { generateUniqueSlug } from "@/lib/slugs";
 import { BlogPost, Prisma, User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -66,7 +67,8 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         text,
-        userId: user.id
+        userId: user.id,
+        slug: await generateUniqueSlug(title)
       }
     });
 
