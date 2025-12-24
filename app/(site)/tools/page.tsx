@@ -33,6 +33,16 @@ export default function ToolsView() {
         }
       </>}
 
+      {data?.user && <>
+        {permsAllow("/tools/playground", data.user.perms) &&
+          <Tool
+            title="Playground"
+            description="Funny buttons for current work project"
+            href="/tools/playground"
+          />
+        }
+      </>}
+
     </div>
     {data?.user &&
       <CustomButton onClick={logout}>
