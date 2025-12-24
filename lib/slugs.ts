@@ -25,3 +25,17 @@ export async function generateUniqueSlug(title: string) {
 
   return slug;
 }
+
+export async function generateUniqueNoteSlug(title: string) {
+  const base = makeSlug(title);
+  let slug = base;
+  let i = 1;
+
+  // HACK: this is probably not the best practice
+  // but its not like we'll get a lot of matching titles
+  while (await prisma.note.findUnique({ where: { slug } })) {
+    slug = `${base}-${i++}`;
+  }
+
+  return slug;
+}

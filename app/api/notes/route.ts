@@ -1,7 +1,7 @@
 import { dbGetUserCredentials } from "@/lib/credentials";
 import { prisma } from "@/lib/prisma";
 import { SessionData, sessionOptions } from "@/lib/session";
-import { generateUniqueSlug } from "@/lib/slugs";
+import { generateUniqueNoteSlug, generateUniqueSlug } from "@/lib/slugs";
 import { Note } from "@prisma/client";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -45,20 +45,22 @@ export async function PUT(req: NextRequest) {
   try {
     const { ownerId, done, title, isPublic, apiKey, ...rest } = await req.json();
     const userData = await dbGetUserCredentials(apiKey);
+    if (!userData) throw "Not logged in"
 
     // check if owner is correct
-    if (userData?.id !== ownerId && !userData?.perms.includes("admin")) throw "Unauthorized";
+    if (userData.id !== ownerId && !userData.perms.includes("admin")) throw "Unauthorized";
 
     const note = await prisma.note.create({
       data: {
         ...rest,
         ownerId, done, title, isPublic,
-        slug: generateUniqueSlug(title),
+        slug: await generateUniqueNoteSlug(title),
       }
     });
 
     res = { note }
   } catch (e) {
+    console.error(e)
     res = { error: String(e) }
   }
 
