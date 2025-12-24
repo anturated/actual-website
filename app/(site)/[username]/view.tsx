@@ -160,7 +160,7 @@ function UserDisplay({ username, user, isOwner, onSave }: { username: string, us
         {/* editor */}
         {editing && user &&
           <form
-            className="flex flex-col gap-1 h-full max-w-[176px]"
+            className="flex flex-col gap-1 h-full max-w-[176px] md:max-w-full"
             onSubmit={onSubmitEdits}
           >
             <input
