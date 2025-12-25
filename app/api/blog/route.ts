@@ -79,3 +79,48 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(res, { status: 400 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  let res: PostResponse;
+
+  try {
+    const { apiKey, id, title, text } = await req.json();
+
+    const userData = await dbGetUserCredentials(apiKey);
+    const oldPost = await prisma.blogPost.findUnique({ where: { id } });
+
+    if (!oldPost) throw "Post not found";
+    if (!userData || userData.id !== oldPost.userId) throw "Unauthorized"
+
+    const post = await prisma.blogPost.update({
+      where: { id },
+      data: { title, text },
+    });
+
+    res = { post }
+  } catch (e) {
+    res = { error: String(e) }
+    return NextResponse.json(res, { status: 400 });
+  }
+
+  return NextResponse.json(res);
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { apiKey, id } = await req.json();
+
+    const userData = await dbGetUserCredentials(apiKey);
+    if (!userData) throw "Unauthorized"
+
+    const post = await prisma.blogPost.delete({
+      where: { id }
+    }).catch(() => {
+      throw "Post not found"
+    })
+  } catch (e) {
+    return NextResponse.json(String(e), { status: 400 });
+  }
+
+  return new NextResponse(null, { status: 200 });
+}

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogPostView from "./view";
 
 
 export async function generateStaticParams() {
@@ -26,21 +26,5 @@ export default async function BlogPostPage({
 
   if (!post) notFound();
 
-  return (
-    <article className="flex flex-col w-full items-center gap-8">
-      <h1 className="text-2xl md:text-4xl">{post.title}</h1>
-      <Link
-        href={`/@${post.user.username}`}
-        className="text-outline hover:text-primary"
-      >
-        by {post.user.username}
-      </Link>
-      {post.text &&
-        <textarea className="mt-10 w-full resize-none md:text-lg"
-          disabled
-          value={post.text}
-        />
-      }
-    </article>
-  )
+  return <BlogPostView post={post} />
 }
