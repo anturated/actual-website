@@ -62,6 +62,7 @@ export async function PUT(req: NextRequest) {
   } catch (e) {
     console.error(e)
     res = { error: String(e) }
+    return NextResponse.json(res, { status: 400 });
   }
 
   return NextResponse.json(res)
@@ -92,7 +93,9 @@ export async function PATCH(req: NextRequest) {
 
     res = { note: note }
   } catch (e) {
+    console.error(e)
     res = { error: String(e) }
+    return NextResponse.json(res, { status: 400 });
   }
 
   return NextResponse.json(res);
@@ -108,7 +111,9 @@ export async function DELETE(req: NextRequest) {
 
     res = { note }
   } catch (e) {
+    console.error(e)
     res = { error: String(e) }
+    return NextResponse.json(res, { status: 400 });
   }
 
   return NextResponse.json(res);

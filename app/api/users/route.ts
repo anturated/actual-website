@@ -58,7 +58,9 @@ export async function GET(req: NextRequest) {
       }
     }
   } catch (e) {
+    console.error(e)
     res = { error: String(e) }
+    return NextResponse.json(res, { status: 400 });
   }
 
   return NextResponse.json(res);
@@ -94,7 +96,9 @@ export async function PATCH(req: NextRequest) {
       }
     };
   } catch (e) {
-    res = { error: String(e) };
+    console.error(e)
+    res = { error: String(e) }
+    return NextResponse.json(res, { status: 400 });
   }
 
   return NextResponse.json(res);

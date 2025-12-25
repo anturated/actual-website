@@ -43,7 +43,7 @@ export async function PUT(req: NextRequest) {
   if (!year || !month || !day || !seconds) return;
 
   const user = await dbGetUserCredentials(apiKey);
-  if (!user) return NextResponse.json("Invalid credentials", { status: 200 });
+  if (!user) return NextResponse.json("Invalid credentials", { status: 400 });
 
   const userId = user.id;
 
