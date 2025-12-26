@@ -1,6 +1,6 @@
 "use client"
 
-import { BlogPostWithUser } from "@/app/api/blog/route";
+import { BlogPostListItem } from "@/app/api/blog/route";
 import { CustomButton } from "@/components/CustomButton";
 import { meFetcher, postsFetcher } from "@/lib/fetchers"
 import Link from "next/link";
@@ -14,7 +14,7 @@ export default function Tools() {
   const sendPost = async (title: string, text: string): Promise<Boolean> => {
     if (!data?.posts || !userData?.user || !title) return false;
 
-    const post: BlogPostWithUser = {
+    const post: BlogPostListItem = {
       id: crypto.randomUUID(),
       title,
       text,
@@ -52,7 +52,7 @@ export default function Tools() {
   )
 }
 
-function Post({ post, userId }: { post: BlogPostWithUser, userId?: string }) {
+function Post({ post, userId }: { post: BlogPostListItem, userId?: string }) {
   return (
     <Link href={`/blog/${post.slug}`} className="flex flex-col gap-2 bg-surface-container-high rounded-2xl p-2">
       <p className="text-lg font-semibold">{post.title}</p>

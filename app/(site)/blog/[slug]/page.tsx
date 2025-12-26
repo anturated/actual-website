@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import BlogPostView from "./view";
+import { getPostBySlug } from "@/lib/blog";
 
 
 export async function generateStaticParams() {
@@ -14,16 +15,10 @@ export async function generateStaticParams() {
 export const revalidate = 60;
 
 
-export default async function BlogPostPage({
-  params
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const post = await prisma.blogPost.findUnique({
-    where: { slug: (await params).slug },
-    include: { user: true }
-  })
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const slug = (await params).slug;
 
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
   return <BlogPostView post={post} />

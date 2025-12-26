@@ -1,10 +1,10 @@
 import { dbGetUserCredentials } from "@/lib/credentials";
 import { prisma } from "@/lib/prisma";
 import { generateUniqueSlug } from "@/lib/slugs";
-import { BlogPost, Prisma, User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-export type BlogPostWithUser = Prisma.BlogPostGetPayload<{
+export type BlogPostListItem = Prisma.BlogPostGetPayload<{
   include: {
     user: {
       select: {
@@ -16,13 +16,8 @@ export type BlogPostWithUser = Prisma.BlogPostGetPayload<{
 }>
 
 export interface BlogResponse {
-  posts?: BlogPostWithUser[],
+  posts?: BlogPostListItem[],
   error?: string
-}
-
-export interface PostResponse {
-  post?: BlogPost,
-  error?: string,
 }
 
 export async function GET(req: NextRequest) {
@@ -55,7 +50,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  let res: PostResponse;
+  let res: BlogResponse;
 
   try {
     const { apiKey, title, text } = await req.json();
@@ -69,10 +64,19 @@ export async function POST(req: NextRequest) {
         text,
         userId: user.id,
         slug: await generateUniqueSlug(title)
+      },
+
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true
+          }
+        }
       }
     });
 
-    res = { post }
+    res = { posts: [post] };
     return NextResponse.json(res);
   } catch (e) {
     res = { error: String(e) };
@@ -80,47 +84,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PATCH(req: NextRequest) {
-  let res: PostResponse;
-
-  try {
-    const { apiKey, id, title, text } = await req.json();
-
-    const userData = await dbGetUserCredentials(apiKey);
-    const oldPost = await prisma.blogPost.findUnique({ where: { id } });
-
-    if (!oldPost) throw "Post not found";
-    if (!userData || userData.id !== oldPost.userId) throw "Unauthorized"
-
-    const post = await prisma.blogPost.update({
-      where: { id },
-      data: { title, text },
-    });
-
-    res = { post }
-  } catch (e) {
-    res = { error: String(e) }
-    return NextResponse.json(res, { status: 400 });
-  }
-
-  return NextResponse.json(res);
-}
-
-export async function DELETE(req: NextRequest) {
-  try {
-    const { apiKey, id } = await req.json();
-
-    const userData = await dbGetUserCredentials(apiKey);
-    if (!userData) throw "Unauthorized"
-
-    const post = await prisma.blogPost.delete({
-      where: { id }
-    }).catch(() => {
-      throw "Post not found"
-    })
-  } catch (e) {
-    return NextResponse.json(String(e), { status: 400 });
-  }
-
-  return new NextResponse(null, { status: 200 });
-}

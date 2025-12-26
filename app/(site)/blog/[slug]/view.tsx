@@ -1,16 +1,17 @@
 "use client"
 
-import { BlogPostWithUser, PostResponse } from "@/app/api/blog/route";
+import { BlogPostListItem, } from "@/app/api/blog/route";
 import { CustomButton } from "@/components/CustomButton";
 import { meFetcher } from "@/lib/fetchers";
 import { BlogPost } from "@prisma/client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import useSWR from "swr";
 
-export default function BlogPostView({ post }: { post: BlogPostWithUser }) {
+export default function BlogPostView({ post }: { post: BlogPostListItem }) {
   const { data: userData } = useSWR("/api/me", meFetcher);
+  const router = useRouter();
 
   const [editing, setEditing] = useState(false);
 
@@ -24,12 +25,11 @@ export default function BlogPostView({ post }: { post: BlogPostWithUser }) {
     if (!title) return;
 
     const newPost: Partial<BlogPost> = {
-      id: post.id,
       title,
       text,
     }
 
-    const res = await fetch("/api/blog", {
+    const res = await fetch(`/api/blog/${post.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newPost)
@@ -37,15 +37,7 @@ export default function BlogPostView({ post }: { post: BlogPostWithUser }) {
 
     if (!res.ok) return;
 
-    const updatedPost: PostResponse = await res.json();
-    post = {
-      ...post,
-      ...updatedPost
-    }
-
-    if (textRef.current)
-      textRef.current.value = updatedPost.post?.text ?? "";
-
+    router.refresh();
     setEditing(false);
   }
 
@@ -57,10 +49,8 @@ export default function BlogPostView({ post }: { post: BlogPostWithUser }) {
   }
 
   const onDelete = async () => {
-    const res = await fetch("/api/blog", {
+    const res = await fetch(`/api/blog/${post.id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: post.id })
     })
 
     if (res.ok) redirect("/blog");
