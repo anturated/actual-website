@@ -35,7 +35,7 @@ export interface PostResponse {
   error?: string,
 }
 
-export async function GET(req: NextRequest, params: Promise<{ postId: string }>) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ postId: string }> }) {
   let res: PostResponse;
 
   try {
