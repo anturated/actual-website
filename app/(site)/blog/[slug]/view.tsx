@@ -1,17 +1,22 @@
 "use client"
 
-import { BlogPostListItem, } from "@/app/api/blog/route";
+import { BlogPostFull } from "@/app/api/blog/[postId]/route";
 import { CustomButton } from "@/components/CustomButton";
+import { MaterialIcon } from "@/components/MaterialIcon";
 import { meFetcher } from "@/lib/fetchers";
 import { BlogPost } from "@prisma/client";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 
-export default function BlogPostView({ post }: { post: BlogPostListItem }) {
+export default function BlogPostView({ post }: { post: BlogPostFull }) {
   const { data: userData } = useSWR("/api/me", meFetcher);
   const router = useRouter();
+
+  const isLiked = useMemo(() => {
+    return post.likes.some(l => l.userId === userData?.user?.id)
+  }, [post])
 
   const [editing, setEditing] = useState(false);
 
@@ -56,8 +61,22 @@ export default function BlogPostView({ post }: { post: BlogPostListItem }) {
     if (res.ok) redirect("/blog");
   }
 
-  return (
-    <article className="flex flex-col w-full items-center gap-8">
+  const onLike = async () => {
+    let method: string;
+    if (!isLiked)
+      method = "PUT";
+    else
+      method = "DELETE";
+
+    const response = await fetch(`/api/blog/${post.id}/like`, {
+      method
+    });
+
+    if (response.ok) router.refresh();
+  }
+
+  return (<>
+    <article className="flex flex-col w-full grow items-center gap-8">
       <div className="text-2xl md:text-4xl text-center w-full">
         {editing ? (
           <input
@@ -106,12 +125,23 @@ export default function BlogPostView({ post }: { post: BlogPostListItem }) {
       </div>
 
       {post.text &&
-        <textarea className={`mt-10 w-full resize-none md:text-lg${editing ? " bg-surface-container rounded-lg" : ""}`}
+        <textarea className={`mt-10 w-full resize-none md:text-lg grow${editing ? " bg-surface-container rounded-lg" : ""}`}
           disabled={!editing}
           defaultValue={post.text}
           ref={textRef}
         />
       }
     </article>
-  )
+
+    {/* likes */}
+    <button
+      className="flex flex-row gap-4 cursor-pointer"
+      onClick={onLike}
+    >
+      <MaterialIcon>
+        thumb_up
+      </MaterialIcon>
+      {post.likes.length}
+    </button>
+  </>)
 }

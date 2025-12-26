@@ -30,6 +30,8 @@ model User {
 
   apiKeyHash String?    @unique
   blogPosts  BlogPost[]
+  likes      Like[]
+  comments   Comment[]
 }
 
 model Note {
@@ -60,15 +62,42 @@ model WorkHours {
 model BlogPost {
   id String @id @default(uuid())
 
-  title String
-  text  String?
-  slug  String  @unique
+  title    String
+  text     String?
+  slug     String    @unique
+  likes    Like[]
+  comments Comment[]
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
   created DateTime @default(now())
   updated DateTime @updatedAt
+}
+
+model Like {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  post   BlogPost @relation(fields: [postId], references: [id])
+  postId String
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id   String @id @default(uuid())
+  text String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  post   BlogPost @relation(fields: [postId], references: [id])
+  postId String
+
+  @@unique([userId, postId])
 }
 
 model Avatar {
