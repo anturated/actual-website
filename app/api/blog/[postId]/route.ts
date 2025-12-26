@@ -21,6 +21,7 @@ export type BlogPostFull = Prisma.BlogPostGetPayload<{
 
         user: {
           select: {
+            id: true,
             username: true
           }
         }
@@ -113,6 +114,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ po
 
             user: {
               select: {
+                id: true,
                 username: true
               }
             }

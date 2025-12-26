@@ -20,6 +20,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPostFull | null> 
 
           user: {
             select: {
+              id: true,
               username: true
             }
           }

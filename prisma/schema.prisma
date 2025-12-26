@@ -96,8 +96,6 @@ model Comment {
 
   post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
-
-  @@unique([userId, postId])
 }
 
 model Avatar {
