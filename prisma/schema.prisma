@@ -20,6 +20,7 @@ model User {
   id           String   @id @default(uuid())
   username     String   @unique
   passwordHash String
+  apiKeyHash   String?  @unique
   perms        String[] @default([])
   avatar       Avatar?
   description  String?
@@ -28,10 +29,14 @@ model User {
   notes              Note[]
   workHours          WorkHours[]
 
-  apiKeyHash String?    @unique
-  blogPosts  BlogPost[]
-  likes      Like[]
-  comments   Comment[]
+  blogPosts BlogPost[]
+  likes     Like[]
+  comments  Comment[]
+
+  memberProjects Project[] @relation("ProjectMembers")
+  ownedProjects  Project[] @relation("ProjectOwner")
+  ownedCards     Card[]    @relation("CardOwner")
+  assignedCards  Card[]    @relation("CardAssigned")
 }
 
 model Note {
@@ -104,4 +109,68 @@ model Avatar {
   data     Bytes
   userId   String @unique
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// kanban stuff
+
+model Project {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  bg          ProjectBG? @relation(fields: [projectBGId], references: [id], onDelete: Cascade)
+  projectBGId String?
+
+  cardTags CardTag[]
+  columns  Column[]
+
+  owner   User   @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+
+  members User[] @relation("ProjectMembers")
+  cards   Card[]
+}
+
+model ProjectBG {
+  id       String @id @default(uuid())
+  mimeType String
+  data     Bytes
+
+  projects Project[]
+}
+
+model Column {
+  id        String  @id @default(uuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  title String
+  cards Card[]
+}
+
+model Card {
+  id        String  @id @default(uuid())
+  column    Column  @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  columnId  String
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String // this is here for slugs
+  owner     User    @relation("CardOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  assigned  User[]  @relation("CardAssigned")
+
+  title String
+  slug  String
+  text  String    @default("")
+  tags  CardTag[]
+
+  @@unique([projectId, slug])
+}
+
+model CardTag {
+  id        String  @id @default(uuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  name  String
+  color String @default("#333")
+  cards Card[]
 }
