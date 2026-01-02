@@ -23,6 +23,14 @@ export default function ToolsView() {
         href="/tools/notes"
       />
 
+      {data?.user &&
+        <Tool
+          title="Projects"
+          description="Kanban thing"
+          href="/tools/projects"
+        />
+      }
+
       {data?.user && <>
         {permsAllow("/tools/edit-users", data.user.perms) &&
           <Tool

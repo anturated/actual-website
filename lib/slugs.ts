@@ -17,8 +17,6 @@ export async function generateUniqueSlug(title: string) {
   let slug = base;
   let i = 1;
 
-  // HACK: this is probably not the best practice
-  // but its not like we'll get a lot of matching titles
   while (await prisma.blogPost.findUnique({ where: { slug } })) {
     slug = `${base}-${i++}`;
   }
@@ -31,9 +29,40 @@ export async function generateUniqueNoteSlug(title: string) {
   let slug = base;
   let i = 1;
 
-  // HACK: this is probably not the best practice
-  // but its not like we'll get a lot of matching titles
   while (await prisma.note.findUnique({ where: { slug } })) {
+    slug = `${base}-${i++}`;
+  }
+
+  return slug;
+}
+
+
+export async function generateUniqueProejctSlug(title: string) {
+  const base = makeSlug(title);
+  let slug = base;
+  let i = 1;
+
+  while (await prisma.project.findUnique({ where: { slug } })) {
+    slug = `${base}-${i++}`;
+  }
+
+  return slug;
+}
+
+
+export async function generateUniqueCardSlug(title: string, projectId: string) {
+  const base = makeSlug(title);
+  let slug = base;
+  let i = 1;
+
+  while (await prisma.card.findUnique({
+    where: {
+      projectId_slug: {
+        projectId,
+        slug,
+      }
+    }
+  })) {
     slug = `${base}-${i++}`;
   }
 

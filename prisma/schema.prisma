@@ -142,9 +142,12 @@ model Column {
   id        String  @id @default(uuid())
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
+  order     Int
 
   title String
   cards Card[]
+
+  @@unique([projectId, order])
 }
 
 model Card {
@@ -156,6 +159,7 @@ model Card {
   owner     User    @relation("CardOwner", fields: [ownerId], references: [id])
   ownerId   String
   assigned  User[]  @relation("CardAssigned")
+  order     Int
 
   title String
   slug  String
@@ -163,6 +167,7 @@ model Card {
   tags  CardTag[]
 
   @@unique([projectId, slug])
+  @@unique([columnId, order])
 }
 
 model CardTag {

@@ -1,6 +1,8 @@
 import { BlogResponse } from "@/app/api/blog/route";
 import { MeResponse } from "@/app/api/me/route";
 import { NotesResponse } from "@/app/api/notes/route";
+import { ProjectResponse } from "@/app/api/projects/[projectId]/route";
+import { ProjectsResponse } from "@/app/api/projects/route";
 import { WorkHoursResponse } from "@/app/api/users/calendar/route";
 import { UserResponse, UsersResponse } from "@/app/api/users/route";
 import { Fetcher } from "swr";
@@ -37,6 +39,18 @@ export const calendarFetcher: Fetcher<WorkHoursResponse, string> = (url: string)
   })
 
 export const postsFetcher: Fetcher<BlogResponse, string> = (url: string) =>
+  fetch(url).then(r => {
+    if (!r.ok) throw new Error("Fetch failed")
+    return r.json()
+  })
+
+export const projectsFetcher: Fetcher<ProjectsResponse, string> = (url: string) =>
+  fetch(url).then(r => {
+    if (!r.ok) throw new Error("Fetch failed")
+    return r.json()
+  })
+
+export const projectFetcher: Fetcher<ProjectResponse, string> = (url: string) =>
   fetch(url).then(r => {
     if (!r.ok) throw new Error("Fetch failed")
     return r.json()
