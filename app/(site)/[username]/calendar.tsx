@@ -20,7 +20,7 @@ function getFirstWeekday(year: number, month: number) {
   return (d + 6) % 7; // that's one way to do overflow
 }
 
-export default function Calendar({ username }: { username: string }) {
+export default function Calendar({ userId }: { userId: string }) {
   const today = new Date();
   const [date, setDate] = useState({
     year: today.getFullYear(),
@@ -56,7 +56,7 @@ export default function Calendar({ username }: { username: string }) {
   }
 
   const { data, error } = useSWR(
-    `/api/users/calendar?u=${username}&y=${date.year}&m=${date.month + 1}`,
+    `/api/users/${userId}/calendar?y=${date.year}&m=${date.month + 1}`,
     calendarFetcher
   );
 
