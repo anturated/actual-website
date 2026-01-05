@@ -3,8 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { BlogPost, Prisma } from "@prisma/client"
 import { NextRequest, NextResponse } from "next/server"
 
-
-export type BlogPostFull = Prisma.BlogPostGetPayload<{
+export const blogPostWithEverything = {
   include: {
     user: {
       select: {
@@ -29,7 +28,8 @@ export type BlogPostFull = Prisma.BlogPostGetPayload<{
     }
 
   }
-}>
+} satisfies Prisma.BlogPostDefaultArgs;
+export type BlogPostFull = Prisma.BlogPostGetPayload<typeof blogPostWithEverything>
 
 export interface PostResponse {
   post?: BlogPostFull,
@@ -44,29 +44,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ post
 
     const post = await prisma.blogPost.findUnique({
       where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-          }
-        },
-
-        likes: true,
-
-        comments: {
-          select: {
-            text: true,
-
-            user: {
-              select: {
-                username: true
-              }
-            }
-          }
-        }
-
-      },
+      ...blogPostWithEverything,
     });
 
     if (!post) throw "Post not found";
@@ -98,30 +76,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ po
     const post = await prisma.blogPost.update({
       where: { id },
       data: { title, text },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-          }
-        },
-
-        likes: true,
-
-        comments: {
-          select: {
-            text: true,
-
-            user: {
-              select: {
-                id: true,
-                username: true
-              }
-            }
-          }
-        }
-
-      },
+      ...blogPostWithEverything,
     });
 
     res = { post }

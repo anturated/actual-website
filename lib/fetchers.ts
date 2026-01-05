@@ -3,8 +3,9 @@ import { MeResponse } from "@/app/api/me/route";
 import { NotesResponse } from "@/app/api/notes/route";
 import { ProjectResponse } from "@/app/api/projects/[projectId]/route";
 import { ProjectsResponse } from "@/app/api/projects/route";
-import { WorkHoursResponse } from "@/app/api/users/calendar/route";
-import { UserResponse, UsersResponse } from "@/app/api/users/route";
+import { WorkHoursResponse } from "@/app/api/users/[id]/calendar/route";
+import { UserResponse } from "@/app/api/users/[id]/route";
+import { UsersResponse } from "@/app/api/users/route";
 import { Fetcher } from "swr";
 
 export const meFetcher: Fetcher<MeResponse, string> = (url: string) =>
