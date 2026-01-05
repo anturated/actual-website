@@ -7,6 +7,9 @@ import KanbanHeader from "./KanbanHeader";
 import { FormEvent, Ref, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "@prisma/client";
 import { MaterialIcon } from "@/components/MaterialIcon";
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function ProjectView({ defaultProject }: { defaultProject: ProjectFull }) {
   const { data, mutate } = useSWR(
@@ -20,6 +23,11 @@ export default function ProjectView({ defaultProject }: { defaultProject: Projec
   const project = useMemo<ProjectFull | undefined>(() => {
     return data?.project;
   }, [data])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const onCardAdd = async (title: string, columnId: string): Promise<boolean> => {
     if (!title || !columnId) return false;
@@ -86,6 +94,14 @@ export default function ProjectView({ defaultProject }: { defaultProject: Projec
 
   }
 
+  // TODO: CARDS BOUNCE BETWEEN COLUMNS FIX IT
+
+  const allCards = useMemo<string[]>(() => {
+    if (!project?.columns.some(c => c.cards)) return [];
+
+    return project.columns.flatMap(c => c.cards.map(ca => ca.id))
+  }, [project])
+
   return (
     <div className="flex flex-col w-full relative">
       <KanbanHeader
@@ -93,14 +109,25 @@ export default function ProjectView({ defaultProject }: { defaultProject: Projec
         userData={userData?.user}
       />
       <div className="flex flex-row gap-4 p-4" >
-        {project?.columns && project.columns.map(col => (
-          <KanbanColumn
-            column={col}
-            key={col.id}
-            onCardAdd={onCardAdd}
-            onCardRemove={onCardRemove}
-          />
-        ))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onCardMove}
+        >
+
+          <SortableContext
+            items={allCards}
+          >
+            {project?.columns && project.columns.map(col => (
+              <KanbanColumn
+                column={col}
+                key={col.id}
+                onCardAdd={onCardAdd}
+                onCardRemove={onCardRemove}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
   )
@@ -118,6 +145,13 @@ export function KanbanColumn({
   const [adding, setAdding] = useState(false);
   const newCardRef = useRef<HTMLInputElement | null>(null);
   const [defaultText, setDefaultText] = useState("");
+
+  const { setNodeRef } = useDroppable({
+    id: column.id,
+    data: {
+      type: 'column',
+    },
+  });
 
   // autofocus new card
   useEffect(() => {
@@ -149,11 +183,15 @@ export function KanbanColumn({
   return (
     <div
       className="flex flex-col gap-2 rounded-lg p-2 bg-surface-container w-48 h-min"
+      ref={setNodeRef}
     >
       {/* header */}
       <p className="mx-2">{column.title}</p>
       {/* cards container */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2"
+        ref={setNodeRef}
+      >
+
         {column.cards && column.cards.length > 0 &&
           column.cards.map(card => (
             <KanbanCard card={card} key={card.id} />
@@ -168,7 +206,8 @@ export function KanbanColumn({
         }
       </div>
       {/* footer */}
-      {!adding &&
+      {
+        !adding &&
         <button
           className="flex flex-row items-center gap-2 text-outline"
           onClick={() => setAdding(true)}
@@ -177,13 +216,28 @@ export function KanbanColumn({
           add card
         </button>
       }
-    </div>
+    </div >
   )
 }
 
 export function KanbanCard({ card }: { card: Card }) {
+  const { attributes, listeners, setNodeRef, transform } =
+    useSortable({
+      id: card.id,
+      data: {
+        type: 'card',
+        columnId: card.columnId,
+      }
+    })
+
   return (
-    <div className="rounded-md bg-surface-container-high px-2 py-1">
+    <div
+      className="rounded-md bg-surface-container-high px-2 py-1"
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform) }}
+      {...attributes}
+      {...listeners}
+    >
       <p>{card.title}</p>
     </div>
   )
