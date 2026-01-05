@@ -1,15 +1,13 @@
 "use client"
 
-import { ColumnFull, ProjectFull } from "@/app/api/projects/[projectId]/route";
+import { ProjectFull } from "@/app/api/projects/[projectId]/route";
 import { meFetcher, projectFetcher } from "@/lib/fetchers";
 import useSWR from "swr";
 import KanbanHeader from "./KanbanHeader";
-import { FormEvent, Ref, useEffect, useMemo, useRef, useState } from "react";
-import { Card } from "@prisma/client";
-import { MaterialIcon } from "@/components/MaterialIcon";
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useMemo } from "react";
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { rectSortingStrategy, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { KanbanColumn } from "./KanbanColumn";
 
 export default function ProjectView({ defaultProject }: { defaultProject: ProjectFull }) {
   const { data, mutate } = useSWR(
@@ -117,6 +115,7 @@ export default function ProjectView({ defaultProject }: { defaultProject: Projec
 
           <SortableContext
             items={allCards}
+            strategy={rectSortingStrategy}
           >
             {project?.columns && project.columns.map(col => (
               <KanbanColumn
@@ -130,136 +129,5 @@ export default function ProjectView({ defaultProject }: { defaultProject: Projec
         </DndContext>
       </div>
     </div>
-  )
-}
-
-export function KanbanColumn({
-  column,
-  onCardAdd,
-  onCardRemove
-}: {
-  column: ColumnFull
-  onCardAdd: any,
-  onCardRemove: any
-}) {
-  const [adding, setAdding] = useState(false);
-  const newCardRef = useRef<HTMLInputElement | null>(null);
-  const [defaultText, setDefaultText] = useState("");
-
-  const { setNodeRef } = useDroppable({
-    id: column.id,
-    data: {
-      type: 'column',
-    },
-  });
-
-  // autofocus new card
-  useEffect(() => {
-    if (adding && newCardRef.current) {
-      newCardRef.current.value = defaultText;
-      newCardRef.current.focus();
-    }
-  }, [adding])
-
-  const onCardSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const target = e.currentTarget;
-
-    const title = newCardRef.current?.value;
-
-    if (!title) return;
-
-    // hide form for optimistic update
-    const ok = onCardAdd(title, column.id);
-    setAdding(false);
-
-    // restore
-    if (!await ok) {
-      setDefaultText(title);
-      setAdding(true);
-    }
-  }
-
-  return (
-    <div
-      className="flex flex-col gap-2 rounded-lg p-2 bg-surface-container w-48 h-min"
-      ref={setNodeRef}
-    >
-      {/* header */}
-      <p className="mx-2">{column.title}</p>
-      {/* cards container */}
-      <div className="flex flex-col gap-2"
-        ref={setNodeRef}
-      >
-
-        {column.cards && column.cards.length > 0 &&
-          column.cards.map(card => (
-            <KanbanCard card={card} key={card.id} />
-          ))
-        }
-        {adding &&
-          <KanbanNewCard
-            onSubmit={onCardSubmit}
-            onBlur={() => setAdding(false)}
-            ref={newCardRef}
-          />
-        }
-      </div>
-      {/* footer */}
-      {
-        !adding &&
-        <button
-          className="flex flex-row items-center gap-2 text-outline"
-          onClick={() => setAdding(true)}
-        >
-          <MaterialIcon>add</MaterialIcon>
-          add card
-        </button>
-      }
-    </div >
-  )
-}
-
-export function KanbanCard({ card }: { card: Card }) {
-  const { attributes, listeners, setNodeRef, transform } =
-    useSortable({
-      id: card.id,
-      data: {
-        type: 'card',
-        columnId: card.columnId,
-      }
-    })
-
-  return (
-    <div
-      className="rounded-md bg-surface-container-high px-2 py-1"
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform) }}
-      {...attributes}
-      {...listeners}
-    >
-      <p>{card.title}</p>
-    </div>
-  )
-}
-
-export function KanbanNewCard({
-  onSubmit,
-  onBlur,
-  ref,
-}: {
-  onSubmit: any,
-  onBlur: any,
-  ref: Ref<HTMLInputElement>
-}) {
-  return (
-    <form onSubmit={onSubmit} className="min-w-0">
-      <input
-        className="min-w-0 outline-0 bg bg-surface-container-high p-2 rounded-md"
-        placeholder="Card name"
-        ref={ref}
-        onBlur={onBlur}
-      />
-    </form>
   )
 }
