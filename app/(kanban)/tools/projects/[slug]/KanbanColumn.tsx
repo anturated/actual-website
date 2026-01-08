@@ -1,15 +1,17 @@
 import { ColumnFull } from "@/app/api/projects/[projectId]/route";
-import { FormEvent, Ref, useEffect, useRef, useState } from "react";
+import { FormEvent, ReactNode, Ref, useEffect, useRef, useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { KanbanCard } from "./KanbanCard";
 import { MaterialIcon } from "@/components/MaterialIcon";
 
 export function KanbanColumn({
   column,
+  activeCardId,
   onCardAdd,
   onCardRemove
 }: {
   column: ColumnFull
+  activeCardId?: string,
   onCardAdd: any,
   onCardRemove: any
 }) {
@@ -17,12 +19,6 @@ export function KanbanColumn({
   const newCardRef = useRef<HTMLInputElement | null>(null);
   const [defaultText, setDefaultText] = useState("");
 
-  const { setNodeRef } = useDroppable({
-    id: column.id,
-    data: {
-      type: 'column',
-    },
-  });
 
   // autofocus new card
   useEffect(() => {
@@ -54,20 +50,23 @@ export function KanbanColumn({
   return (
     <div
       className="flex flex-col gap-2 rounded-lg p-2 bg-surface-container w-48 h-min"
-      ref={setNodeRef}
     >
       {/* header */}
       <p className="mx-2">{column.title}</p>
       {/* cards container */}
-      <div className="flex flex-col gap-2"
-        ref={setNodeRef}
-      >
-
+      <div className="flex flex-col gap-2" >
         {column.cards && column.cards.length > 0 &&
-          column.cards.map(card => (
-            <KanbanCard card={card} key={card.id} />
+          column.cards.map((card, index) => (
+            activeCardId !== card.id ? (
+              <CardContainer index={index} columnId={column.id} key={card.id} >
+                <KanbanCard card={card} />
+              </CardContainer>
+            ) : (
+              <KanbanCard card={card} />
+            )
           ))
         }
+
         {adding &&
           <KanbanNewCard
             onSubmit={onCardSubmit}
@@ -90,6 +89,25 @@ export function KanbanColumn({
     </div >
   )
 }
+
+export function CardContainer({ columnId, index, children }: { columnId: string, index: number, children: ReactNode }) {
+  const { setNodeRef } = useDroppable({
+    id: `${columnId}-${index}`,
+    data: {
+      type: 'card',
+      columnId,
+      index,
+    },
+  });
+
+  // TODO: probably can be done without an extra div
+  return (
+    <div ref={setNodeRef} >
+      {children}
+    </div>
+  )
+}
+
 export function KanbanNewCard({
   onSubmit,
   onBlur,

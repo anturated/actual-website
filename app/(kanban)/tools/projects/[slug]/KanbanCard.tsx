@@ -1,10 +1,10 @@
 import { Card } from "@prisma/client"
-import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useDraggable } from "@dnd-kit/core";
 
 export function KanbanCard({ card }: { card: Card }) {
   const { attributes, listeners, setNodeRef, transform } =
-    useSortable({
+    useDraggable({
       id: card.id,
       data: {
         type: 'card',
