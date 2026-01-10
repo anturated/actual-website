@@ -61,3 +61,68 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
     return NextResponse.json(res, { status: 400 })
   }
 }
+
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
+  try {
+    const id = (await params).projectId;
+    if (!id) throw "Where id";
+    const { apiKey, title, members } = await req.json();
+
+    const userData = await dbGetUserCredentials(apiKey);
+    if (!userData) throw "Unauthorized";
+
+    const project = await prisma.project.findUnique({
+      where: { id },
+      select: { members: true },
+    });
+    if (!project) throw "Project not found";
+    if (!project.members.some(m => m.id === userData.id)) throw "No permission";
+
+    await prisma.project.update({
+      where: { id },
+      data: {
+        title,
+        // TODO: figure out members
+      }
+    });
+
+    return new NextResponse(null, { status: 200 });
+  } catch (e) {
+    console.error(e);
+    return new NextResponse(String(e), { status: 400 });
+  }
+}
+
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
+  try {
+    try {
+      const id = (await params).projectId;
+      if (!id) throw "Where id";
+      const { apiKey } = await req.json();
+
+      const userData = await dbGetUserCredentials(apiKey);
+      if (!userData) throw "Unauthorized";
+
+      const project = await prisma.project.findUnique({
+        where: { id },
+        select: { ownerId: true },
+      });
+      if (!project) throw "Project not found";
+      if (userData.id !== project.ownerId) throw "No permission";
+
+      await prisma.project.delete({
+        where: { id },
+      });
+
+      return new NextResponse(null, { status: 200 });
+    } catch (e) {
+      console.error(e);
+      return new NextResponse(String(e), { status: 400 });
+    }
+  } catch (e) {
+    console.error(e);
+    return new NextResponse(String(e), { status: 400 });
+  }
+}
