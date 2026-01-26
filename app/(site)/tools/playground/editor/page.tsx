@@ -7,32 +7,32 @@ import { redirect } from "next/navigation";
 import { FormHTMLAttributes, forwardRef, useRef, useState } from "react";
 
 interface CreateItemRequest {
-  article: string,
-  translations: CreateItemTranslationDto[],
-  category: string,
+  Article: string,
+  Translations: CreateItemTranslationDto[],
+  Category: string,
 
-  price: number,
-  newPrice?: number,
+  Price: number,
+  NewPrice?: number,
 
-  colorVariants: CreateItemColorVariantDto[],
+  ColorVariants: CreateItemColorVariantDto[],
 }
 
 interface CreateItemColorVariantDto {
-  colorHex: string,
-  sizes: CreateItemSizeVariantDto[],
+  ColorHex: string,
+  Sizes: CreateItemSizeVariantDto[],
 }
 
 interface CreateItemSizeVariantDto {
-  size: string,
-  quantity: number,
+  Size: string,
+  Quantity: number,
 }
 
 interface CreateItemTranslationDto {
-  languageCode: string,
+  LanguageCode: string,
 
-  name: string,
-  description: string,
-  material: string,
+  Name: string,
+  Description: string,
+  Material: string,
 }
 
 function sendError(text: string) {
@@ -46,13 +46,13 @@ interface ColorDraft extends CreateItemColorVariantDto {
 function genEmptyColor(): ColorDraft {
   return {
     id: crypto.randomUUID(),
-    colorHex: "#000000",
-    sizes: [
-      { size: "XS", quantity: 0 },
-      { size: "S", quantity: 0 },
-      { size: "M", quantity: 0 },
-      { size: "L", quantity: 0 },
-      { size: "XL", quantity: 0 },
+    ColorHex: "#000000",
+    Sizes: [
+      { Size: "XS", Quantity: 0 },
+      { Size: "S", Quantity: 0 },
+      { Size: "M", Quantity: 0 },
+      { Size: "L", Quantity: 0 },
+      { Size: "XL", Quantity: 0 },
     ],
   };
 }
@@ -64,13 +64,13 @@ export default function Editor() {
   const newPriceRef = useRef<HTMLInputElement | null>(null);
   const [colors, setColors] = useState<ColorDraft[]>([genEmptyColor()]);
   const [translations, setTranslations] = useState<CreateItemTranslationDto[]>([
-    { languageCode: "en", name: "", description: "", material: "" },
-    { languageCode: "de", name: "", description: "", material: "" },
+    { LanguageCode: "en", Name: "", Description: "", Material: "" },
+    { LanguageCode: "de", Name: "", Description: "", Material: "" },
   ]);
 
   const setTranslation = (translation: CreateItemTranslationDto) => {
     setTranslations(trs => trs.map(tr =>
-      tr.languageCode === translation.languageCode
+      tr.LanguageCode === translation.LanguageCode
         ? translation
         : tr
     ));
@@ -81,9 +81,9 @@ export default function Editor() {
       c.id === colorId
         ? {
           ...c,
-          sizes: c.sizes.map(cs =>
-            cs.size === size
-              ? { ...cs, quantity: quantity }
+          Sizes: c.Sizes.map(cs =>
+            cs.Size === size
+              ? { ...cs, Quantity: quantity }
               : cs
           ),
         }
@@ -94,7 +94,7 @@ export default function Editor() {
   const setColor = (colorId: string, colorHex: string) => {
     setColors(crs => crs.map(c =>
       c.id === colorId
-        ? { ...c, colorHex }
+        ? { ...c, ColorHex: colorHex }
         : c
     ));
   }
@@ -115,12 +115,12 @@ export default function Editor() {
     const formData = new FormData();
 
     const payload = {
-      article,
-      category,
-      price: parseFloat(price),
-      newPrice: newPrice ? parseFloat(newPrice) : undefined,
-      translations,
-      colorVariants: colors,
+      Article: article,
+      Category: category,
+      Price: parseFloat(price),
+      NewPrice: newPrice ? parseFloat(newPrice) : undefined,
+      Translations: translations,
+      ColorVariants: colors,
     } satisfies CreateItemRequest;
 
     formData.append("item", JSON.stringify(payload));
@@ -147,7 +147,7 @@ export default function Editor() {
       <CustomInput ref={newPriceRef} placeholder="new price" />
 
       <div className="flex flex-row gap-2">
-        {translations.map(tr => <TranslationForm translation={tr} setTranslation={setTranslation} key={tr.languageCode} />)}
+        {translations.map(tr => <TranslationForm translation={tr} setTranslation={setTranslation} key={tr.LanguageCode} />)}
       </div>
 
       <div className="flex flex-row gap-2">
@@ -163,6 +163,8 @@ export default function Editor() {
           <MaterialIcon>Add</MaterialIcon>
         </CustomButton>
       </div>
+
+      <CustomButton onClick={onCreate}>Submit</CustomButton>
     </div>
   )
 }
@@ -188,7 +190,7 @@ function TranslationForm({ translation, setTranslation }: { translation: CreateI
       const material = matRef.current?.value ?? "";
 
       setTranslation({
-        languageCode: translation.languageCode,
+        languageCode: translation.LanguageCode,
         name,
         description,
         material,
@@ -198,23 +200,23 @@ function TranslationForm({ translation, setTranslation }: { translation: CreateI
 
   return (
     <div className="flex flex-col gap-2 outline-2 outline-outline p-2">
-      <p>{translation.languageCode}</p>
+      <p>{translation.LanguageCode}</p>
 
       <CustomInput
         placeholder="product name"
-        defaultValue={translation.name}
+        defaultValue={translation.Name}
         ref={nameRef}
         onChange={debounceUpdate}
       />
       <CustomInput
         placeholder="description"
-        defaultValue={translation.name}
+        defaultValue={translation.Name}
         ref={descRef}
         onChange={debounceUpdate}
       />
       <CustomInput
         placeholder="material"
-        defaultValue={translation.name}
+        defaultValue={translation.Name}
         ref={matRef}
         onChange={debounceUpdate}
       />
@@ -227,20 +229,20 @@ function ColorForm({ colorVariant, setColor, setQuantity }: { colorVariant: Colo
     <div className="flex flex-col gap-2 p-2 outline-2 outline-outline">
       <CustomInput
         placeholder="colorHex"
-        defaultValue={colorVariant.colorHex}
+        defaultValue={colorVariant.ColorHex}
         onChange={e => setColor(e.currentTarget.value)}
       />
 
-      {colorVariant.sizes.map(cs =>
+      {colorVariant.Sizes.map(cs =>
         <div
           className="flex flex-row justify-between items-center gap-3"
-          key={cs.size}
+          key={cs.Size}
         >
-          <p>{cs.size}</p>
+          <p>{cs.Size}</p>
           <CustomInput
-            placeholder={cs.size}
-            defaultValue={cs.quantity}
-            onChange={e => setQuantity(colorVariant.id, cs.size, parseInt(e.currentTarget.value))}
+            placeholder={cs.Size}
+            defaultValue={cs.Quantity}
+            onChange={e => setQuantity(colorVariant.id, cs.Size, parseInt(e.currentTarget.value))}
           />
         </div>
       )}
