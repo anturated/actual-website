@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
-import { ColorDraft, CreateItemRequest, CreateItemTranslationDto } from "./types";
+import { ColorDraft, CreateItemRequest, CreateItemTranslationDto, PhotoDraft, PhotoDto } from "./types";
 
 
 function sendError(text: string) {
@@ -25,6 +25,7 @@ function genEmptyColor(): ColorDraft {
       { Size: "L", Quantity: 0 },
       { Size: "XL", Quantity: 0 },
     ],
+    photos: [],
   };
 }
 
@@ -79,15 +80,25 @@ export default function Editor() {
     setColors(crs => [...crs, genEmptyColor()]);
   }
 
+  const setPhotos = (colorId: string, photos: PhotoDraft[]) => {
+    setColors(crs => crs.map(c =>
+      c.id === colorId
+        ? { ...c, photos, }
+        : c
+    ))
+  }
+
   const onCreate = async () => {
     const article = articleRef.current?.value;
     const category = categoryRef.current?.value;
     const price = priceRef.current?.value;
     const newPrice = newPriceRef.current?.value;
 
+    // sanity checks
     if (!article || !price || !category) return;
     if (colors.length < 1) return;
 
+    // add item info
     const formData = new FormData();
 
     const payload = {
@@ -101,6 +112,12 @@ export default function Editor() {
 
     formData.append("item", JSON.stringify(payload));
 
+    // add photos
+    colors.forEach(c =>
+      c.photos.forEach(p => formData.append(p.clientId, p.file))
+    );
+
+    // send request
     const res = await fetch("http://localhost:5000/api/items", {
       method: "POST",
       // headers: { "Content-Type": "application/json" },
@@ -132,6 +149,7 @@ export default function Editor() {
             colorVariant={c}
             setColor={setColor}
             setQuantity={setQuantity}
+            setPhotos={setPhotos}
             key={c.id}
           />
         )}

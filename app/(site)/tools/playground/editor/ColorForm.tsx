@@ -1,15 +1,29 @@
 import { CustomInput } from "@/components/CustomInput"
-import { ColorDraft } from "./types"
+import { ColorDraft, PhotoDraft } from "./types"
+import { ChangeEvent } from "react"
 
 export function ColorForm({
   colorVariant,
   setColor,
-  setQuantity
+  setQuantity,
+  setPhotos,
 }: {
   colorVariant: ColorDraft,
   setColor: (colorId: string, colorHex: string) => void,
   setQuantity: (colorId: string, size: string, quantity: number) => void
+  setPhotos: (colorId: string, photos: PhotoDraft[]) => void
 }) {
+  const onPhotosChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+
+    setPhotos(colorVariant.id, files.map((file, order) => ({
+      clientId: crypto.randomUUID(),
+      file,
+      order,
+      isMain: order === 0,
+    })))
+  }
+
   return (
     <div className="flex flex-col gap-2 p-2 outline-2 outline-outline">
       <CustomInput
@@ -31,6 +45,12 @@ export function ColorForm({
           />
         </div>
       )}
+
+      <input
+        type="file"
+        multiple
+        onChange={onPhotosChange}
+      />
     </div>
   )
 }

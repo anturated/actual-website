@@ -27,7 +27,18 @@ export interface CreateItemTranslationDto {
   Material: string,
 }
 
+export interface PhotoDto {
+  clientId: string,
+  order: number,
+  isMain: boolean,
+}
+
+export interface PhotoDraft extends PhotoDto {
+  file: File,
+}
+
 export interface ColorDraft extends CreateItemColorVariantDto {
   id: string,
+  photos: PhotoDraft[],
 }
 
