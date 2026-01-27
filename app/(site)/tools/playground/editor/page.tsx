@@ -5,8 +5,10 @@ import { CustomInput } from "@/components/CustomInput";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { redirect } from "next/navigation";
 import { FormHTMLAttributes, forwardRef, useEffect, useRef, useState } from "react";
+import { TranslationForm } from "./TranslationForm";
+import { ColorForm } from "./ColorForm";
 
-interface CreateItemRequest {
+export interface CreateItemRequest {
   Article: string,
   Translations: CreateItemTranslationDto[],
   Category: string,
@@ -17,17 +19,17 @@ interface CreateItemRequest {
   ColorVariants: CreateItemColorVariantDto[],
 }
 
-interface CreateItemColorVariantDto {
+export interface CreateItemColorVariantDto {
   ColorHex: string,
   Sizes: CreateItemSizeVariantDto[],
 }
 
-interface CreateItemSizeVariantDto {
+export interface CreateItemSizeVariantDto {
   Size: string,
   Quantity: number,
 }
 
-interface CreateItemTranslationDto {
+export interface CreateItemTranslationDto {
   LanguageCode: string,
 
   Name: string,
@@ -39,7 +41,7 @@ function sendError(text: string) {
   console.error(text);
 }
 
-interface ColorDraft extends CreateItemColorVariantDto {
+export interface ColorDraft extends CreateItemColorVariantDto {
   id: string,
 }
 
@@ -174,98 +176,3 @@ export default function Editor() {
   )
 }
 
-function TranslationForm({
-  translation,
-  setTranslation
-}: {
-  translation: CreateItemTranslationDto,
-  setTranslation: (translation: CreateItemTranslationDto) => void
-}) {
-  const nameRef = useRef<HTMLInputElement | null>(null);
-  const descRef = useRef<HTMLInputElement | null>(null);
-  const matRef = useRef<HTMLInputElement | null>(null);
-
-  const editTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const clearTimer = () => {
-    if (!editTimerRef.current) return;
-    clearTimeout(editTimerRef.current);
-    editTimerRef.current = null;
-  }
-
-  const debounceUpdate = () => {
-    clearTimer();
-
-    editTimerRef.current = setTimeout(() => {
-      const Name = nameRef.current?.value ?? "";
-      const Description = descRef.current?.value ?? "";
-      const Material = matRef.current?.value ?? "";
-      console.log(`saving translation ${translation.LanguageCode} ${Name}`)
-
-      setTranslation({
-        LanguageCode: translation.LanguageCode,
-        Name,
-        Description,
-        Material,
-      });
-    }, 300);
-  }
-
-  return (
-    <div className="flex flex-col gap-2 outline-2 outline-outline p-2">
-      <p>{translation.LanguageCode}</p>
-
-      <CustomInput
-        placeholder="product name"
-        defaultValue={translation.Name}
-        ref={nameRef}
-        onChange={debounceUpdate}
-      />
-      <CustomInput
-        placeholder="description"
-        defaultValue={translation.Name}
-        ref={descRef}
-        onChange={debounceUpdate}
-      />
-      <CustomInput
-        placeholder="material"
-        defaultValue={translation.Name}
-        ref={matRef}
-        onChange={debounceUpdate}
-      />
-    </div>
-  )
-}
-
-function ColorForm({
-  colorVariant,
-  setColor,
-  setQuantity
-}: {
-  colorVariant: ColorDraft,
-  setColor: (colorId: string, colorHex: string) => void,
-  setQuantity: (colorId: string, size: string, quantity: number) => void
-}) {
-  return (
-    <div className="flex flex-col gap-2 p-2 outline-2 outline-outline">
-      <CustomInput
-        placeholder="colorHex"
-        defaultValue={colorVariant.ColorHex}
-        onChange={e => setColor(colorVariant.id, e.currentTarget.value)}
-      />
-
-      {colorVariant.Sizes.map(cs =>
-        <div
-          className="flex flex-row justify-between items-center gap-3"
-          key={cs.Size}
-        >
-          <p>{cs.Size}</p>
-          <CustomInput
-            placeholder={cs.Size}
-            defaultValue={cs.Quantity}
-            onChange={e => setQuantity(colorVariant.id, cs.Size, parseInt(e.currentTarget.value))}
-          />
-        </div>
-      )}
-    </div>
-  )
-}
