@@ -4,7 +4,7 @@ import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { redirect } from "next/navigation";
-import { FormHTMLAttributes, forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
 import { ColorDraft, CreateItemRequest, CreateItemTranslationDto } from "./types";
