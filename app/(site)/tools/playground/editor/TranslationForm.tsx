@@ -1,8 +1,8 @@
 "use client"
 
 import { useRef } from "react";
-import { CreateItemTranslationDto } from "./page";
 import { CustomInput } from "@/components/CustomInput";
+import { CreateItemTranslationDto } from "./types";
 
 
 export function TranslationForm({

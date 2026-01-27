@@ -1,5 +1,5 @@
 import { CustomInput } from "@/components/CustomInput"
-import { ColorDraft } from "./page"
+import { ColorDraft } from "./types"
 
 export function ColorForm({
   colorVariant,

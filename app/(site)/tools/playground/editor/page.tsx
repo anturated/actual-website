@@ -7,42 +7,11 @@ import { redirect } from "next/navigation";
 import { FormHTMLAttributes, forwardRef, useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
+import { ColorDraft, CreateItemRequest, CreateItemTranslationDto } from "./types";
 
-export interface CreateItemRequest {
-  Article: string,
-  Translations: CreateItemTranslationDto[],
-  Category: string,
-
-  Price: number,
-  NewPrice?: number,
-
-  ColorVariants: CreateItemColorVariantDto[],
-}
-
-export interface CreateItemColorVariantDto {
-  ColorHex: string,
-  Sizes: CreateItemSizeVariantDto[],
-}
-
-export interface CreateItemSizeVariantDto {
-  Size: string,
-  Quantity: number,
-}
-
-export interface CreateItemTranslationDto {
-  LanguageCode: string,
-
-  Name: string,
-  Description: string,
-  Material: string,
-}
 
 function sendError(text: string) {
   console.error(text);
-}
-
-export interface ColorDraft extends CreateItemColorVariantDto {
-  id: string,
 }
 
 function genEmptyColor(): ColorDraft {
