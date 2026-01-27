@@ -4,7 +4,7 @@ import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import { redirect } from "next/navigation";
-import { FormHTMLAttributes, forwardRef, useRef, useState } from "react";
+import { FormHTMLAttributes, forwardRef, useEffect, useRef, useState } from "react";
 
 interface CreateItemRequest {
   Article: string,
@@ -67,6 +67,11 @@ export default function Editor() {
     { LanguageCode: "en", Name: "", Description: "", Material: "" },
     { LanguageCode: "de", Name: "", Description: "", Material: "" },
   ]);
+
+  useEffect(() => {
+    const tr = translations.find(t => t.LanguageCode === "en")?.Name;
+    console.log(`translations changed ${tr}`)
+  }, [translations])
 
   const setTranslation = (translation: CreateItemTranslationDto) => {
     setTranslations(trs => trs.map(tr =>
@@ -169,7 +174,13 @@ export default function Editor() {
   )
 }
 
-function TranslationForm({ translation, setTranslation }: { translation: CreateItemTranslationDto, setTranslation: any }) {
+function TranslationForm({
+  translation,
+  setTranslation
+}: {
+  translation: CreateItemTranslationDto,
+  setTranslation: (translation: CreateItemTranslationDto) => void
+}) {
   const nameRef = useRef<HTMLInputElement | null>(null);
   const descRef = useRef<HTMLInputElement | null>(null);
   const matRef = useRef<HTMLInputElement | null>(null);
@@ -185,15 +196,16 @@ function TranslationForm({ translation, setTranslation }: { translation: CreateI
     clearTimer();
 
     editTimerRef.current = setTimeout(() => {
-      const name = nameRef.current?.value ?? "";
-      const description = descRef.current?.value ?? "";
-      const material = matRef.current?.value ?? "";
+      const Name = nameRef.current?.value ?? "";
+      const Description = descRef.current?.value ?? "";
+      const Material = matRef.current?.value ?? "";
+      console.log(`saving translation ${translation.LanguageCode} ${Name}`)
 
       setTranslation({
-        languageCode: translation.LanguageCode,
-        name,
-        description,
-        material,
+        LanguageCode: translation.LanguageCode,
+        Name,
+        Description,
+        Material,
       });
     }, 300);
   }
@@ -224,13 +236,21 @@ function TranslationForm({ translation, setTranslation }: { translation: CreateI
   )
 }
 
-function ColorForm({ colorVariant, setColor, setQuantity }: { colorVariant: ColorDraft, setColor: any, setQuantity: any }) {
+function ColorForm({
+  colorVariant,
+  setColor,
+  setQuantity
+}: {
+  colorVariant: ColorDraft,
+  setColor: (colorId: string, colorHex: string) => void,
+  setQuantity: (colorId: string, size: string, quantity: number) => void
+}) {
   return (
     <div className="flex flex-col gap-2 p-2 outline-2 outline-outline">
       <CustomInput
         placeholder="colorHex"
         defaultValue={colorVariant.ColorHex}
-        onChange={e => setColor(e.currentTarget.value)}
+        onChange={e => setColor(colorVariant.id, e.currentTarget.value)}
       />
 
       {colorVariant.Sizes.map(cs =>
