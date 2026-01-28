@@ -1,5 +1,6 @@
 "use client"
 
+import { MaterialIcon } from "@/components/MaterialIcon";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -33,6 +34,10 @@ export default function Playground() {
           <ItemCard item={i} key={i.article} />
         )
       }
+
+      <Link href="/tools/playground/editor" className="flex flex-row justify-around items-center rounded-2xl bg-surface-container">
+        <MaterialIcon>Add</MaterialIcon>
+      </Link>
     </div>
   )
 }
