@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -38,7 +39,14 @@ export default function Playground() {
 
 function ItemCard({ item }: { item: ItemCardDto }) {
   return (
-    <div className="rounded-2xl outline-2 outline-outline-variant flex flex-col p-2" >
+    <div className="rounded-2xl outline-2 outline-outline-variant flex flex-col p-2 gap-2" >
+      <div className="relative w-full h-40 rounded-2xl overflow-clip">
+        <Image
+          src={item.photoUrl}
+          alt={item.slug}
+          fill
+        />
+      </div>
       <Link className="text-xl font-semibold" href={`/tools/playground/${item.slug}`}>
         {item.title}
       </Link>
