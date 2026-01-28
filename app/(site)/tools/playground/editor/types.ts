@@ -28,9 +28,9 @@ export interface CreateItemTranslationDto {
 }
 
 export interface PhotoDto {
-  clientId: string,
-  order: number,
-  isMain: boolean,
+  FileName: string,
+  Order: number,
+  IsMain: boolean,
 }
 
 export interface PhotoDraft extends PhotoDto {
@@ -39,6 +39,6 @@ export interface PhotoDraft extends PhotoDto {
 
 export interface ColorDraft extends CreateItemColorVariantDto {
   id: string,
-  photos: PhotoDraft[],
+  Photos: PhotoDraft[],
 }
 

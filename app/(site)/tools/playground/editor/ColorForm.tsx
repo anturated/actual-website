@@ -16,11 +16,11 @@ export function ColorForm({
   const onPhotosChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
 
-    setPhotos(colorVariant.id, files.map((file, order) => ({
-      clientId: crypto.randomUUID(),
+    setPhotos(colorVariant.id, files.map((file, Order) => ({
+      FileName: file.name,
       file,
-      order,
-      isMain: order === 0,
+      Order,
+      IsMain: Order === 0,
     })))
   }
 

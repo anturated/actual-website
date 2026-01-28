@@ -25,7 +25,7 @@ function genEmptyColor(): ColorDraft {
       { Size: "L", Quantity: 0 },
       { Size: "XL", Quantity: 0 },
     ],
-    photos: [],
+    Photos: [],
   };
 }
 
@@ -83,7 +83,7 @@ export default function Editor() {
   const setPhotos = (colorId: string, photos: PhotoDraft[]) => {
     setColors(crs => crs.map(c =>
       c.id === colorId
-        ? { ...c, photos, }
+        ? { ...c, Photos: photos, }
         : c
     ))
   }
@@ -114,19 +114,18 @@ export default function Editor() {
 
     // add photos
     colors.forEach(c =>
-      c.photos.forEach(p => formData.append(p.clientId, p.file))
+      c.Photos.forEach(p => formData.append("files", p.file))
     );
 
     // send request
     const res = await fetch("http://localhost:5000/api/items", {
       method: "POST",
-      // headers: { "Content-Type": "application/json" },
       body: formData,
     });
 
     if (res.ok) {
       const j = await res.json();
-      redirect("/playground/" + j.slug);
+      redirect("/tools/playground/" + j.slug);
     } else {
       sendError(await res.json())
     }
