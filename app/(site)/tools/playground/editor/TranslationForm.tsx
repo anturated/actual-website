@@ -53,13 +53,13 @@ export function TranslationForm({
       />
       <CustomInput
         placeholder="description"
-        defaultValue={translation.Name}
+        defaultValue={translation.Description}
         ref={descRef}
         onChange={debounceUpdate}
       />
       <CustomInput
         placeholder="material"
-        defaultValue={translation.Name}
+        defaultValue={translation.Material}
         ref={matRef}
         onChange={debounceUpdate}
       />
