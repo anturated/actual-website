@@ -2,37 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react"
-
-interface ItemFullDto {
-  id: string,
-  article: string,
-
-  title: string,
-  description: string,
-  material: string,
-
-  price: number,
-  newPrice: number,
-
-  colors: ItemColorDto[],
-}
-
-interface ItemColorDto {
-  colorHex: string,
-  sizes: ItemSizeDto[],
-  photos: PhotoDto[],
-}
-
-interface ItemSizeDto {
-  size: string,
-  quantity: number,
-}
-
-interface PhotoDto {
-  id: string,
-  url: string,
-  isMain: boolean,
-}
+import { ItemColorDto, ItemFullDto, PhotoDto } from "../editor/types";
 
 export default function ItemView({ slug }: { slug: string }) {
   const [item, setItem] = useState<ItemFullDto | null>()

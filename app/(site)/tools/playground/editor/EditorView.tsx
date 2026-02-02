@@ -7,38 +7,66 @@ import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
-import { ColorDraft, CreateItemRequest, CreateItemTranslationDto, PhotoDraft, PhotoDto } from "./types";
+import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, ItemFullDto } from "./types";
+
 
 
 function sendError(text: string) {
   console.error(text);
 }
 
-function genEmptyColor(): ColorDraft {
+function genEmptyColor(): ClientColor {
   return {
-    id: crypto.randomUUID(),
-    ColorHex: "#000000",
-    Sizes: [
-      { Size: "XS", Quantity: 0 },
-      { Size: "S", Quantity: 0 },
-      { Size: "M", Quantity: 0 },
-      { Size: "L", Quantity: 0 },
-      { Size: "XL", Quantity: 0 },
+    clientId: crypto.randomUUID(),
+    colorHex: "#000000",
+    sizes: [
+      { size: "XS", quantity: 0 },
+      { size: "S", quantity: 0 },
+      { size: "M", quantity: 0 },
+      { size: "L", quantity: 0 },
+      { size: "XL", quantity: 0 },
     ],
-    Photos: [],
+    photos: [],
   };
 }
 
-export default function EditorView() {
+export default function EditorView({ slug }: { slug?: string }) {
   const articleRef = useRef<HTMLInputElement | null>(null);
   const categoryRef = useRef<HTMLInputElement | null>(null);
   const priceRef = useRef<HTMLInputElement | null>(null);
   const newPriceRef = useRef<HTMLInputElement | null>(null);
-  const [colors, setColors] = useState<ColorDraft[]>([genEmptyColor()]);
-  const [translations, setTranslations] = useState<CreateItemTranslationDto[]>([
+  const [colors, setColors] = useState<ClientColor[]>([genEmptyColor()]);
+  const [translations, setTranslations] = useState<ClientTranslation[]>([
     { LanguageCode: "en", Name: "", Description: "", Material: "" },
     { LanguageCode: "de", Name: "", Description: "", Material: "" },
   ]);
+
+  useEffect(() => {
+    if (!slug) return;
+
+    fetch("http://localhost:5000/api/items/by-slug/" + slug)
+      .then(r => r.json())
+      .then(j => {
+        const dto = j as ItemFullDto;
+
+        setColors(dto.colors.map(c => ({
+          serverId: c.id,
+          clientId: c.id,
+          colorHex: c.colorHex,
+          sizes: c.sizes.map(cs => ({
+            size: cs.size,
+            quantity: cs.quantity,
+          }) satisfies ClientSize),
+          photos: c.photos.map(p => ({
+            serverId: p.id,
+            clientId: p.id,
+            url: p.url,
+            isMain: p.isMain,
+            sortOrder: p.sortOrder,
+          }) satisfies ClientPhoto),
+        })));
+      });
+  }, [slug])
 
   const setTranslation = (translation: CreateItemTranslationDto) => {
     setTranslations(trs => trs.map(tr =>
@@ -50,11 +78,11 @@ export default function EditorView() {
 
   const setQuantity = (colorId: string, size: string, quantity: number) => {
     setColors(crs => crs.map(c =>
-      c.id === colorId
+      c.clientId === colorId
         ? {
           ...c,
-          Sizes: c.Sizes.map(cs =>
-            cs.Size === size
+          Sizes: c.sizes.map(cs =>
+            cs.size === size
               ? { ...cs, Quantity: quantity }
               : cs
           ),
@@ -65,7 +93,7 @@ export default function EditorView() {
 
   const setColor = (colorId: string, colorHex: string) => {
     setColors(crs => crs.map(c =>
-      c.id === colorId
+      c.clientId === colorId
         ? { ...c, ColorHex: colorHex }
         : c
     ));
@@ -75,9 +103,9 @@ export default function EditorView() {
     setColors(crs => [...crs, genEmptyColor()]);
   }
 
-  const setPhotos = (colorId: string, photos: PhotoDraft[]) => {
+  const setPhotos = (colorId: string, photos: ClientPhoto[]) => {
     setColors(crs => crs.map(c =>
-      c.id === colorId
+      c.clientId === colorId
         ? { ...c, Photos: photos, }
         : c
     ))
@@ -96,20 +124,31 @@ export default function EditorView() {
     // add item info
     const formData = new FormData();
 
-    const payload = {
+    const payload = { // jesus
       Article: article,
       Category: category,
       Price: parseFloat(price),
       NewPrice: newPrice ? parseFloat(newPrice) : undefined,
       Translations: translations,
-      ColorVariants: colors,
+      ColorVariants: colors.map(c => ({
+        ColorHex: c.colorHex,
+        Sizes: c.sizes.map(cs => ({
+          Size: cs.size,
+          Quantity: cs.quantity,
+        }) satisfies CreateItemSizeVariantDto),
+        Photos: c.photos.map(p => ({
+          FileName: p.fileName!,
+          SortOrder: p.sortOrder,
+          IsMain: p.isMain,
+        }) satisfies CreatePhotoDto),
+      }) satisfies CreateItemColorVariantDto),
     } satisfies CreateItemRequest;
 
     formData.append("item", JSON.stringify(payload));
 
     // add photos
     colors.forEach(c =>
-      c.Photos.forEach(p => formData.append("files", p.file))
+      c.photos.forEach(p => formData.append("files", p.file!))
     );
 
     // send request
@@ -144,7 +183,7 @@ export default function EditorView() {
             setColor={setColor}
             setQuantity={setQuantity}
             setPhotos={setPhotos}
-            key={c.id}
+            key={c.clientId}
           />
         )}
         <CustomButton className="h-min w-20" onClick={addColor}>

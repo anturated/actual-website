@@ -16,7 +16,7 @@ export function ColorForm({
   const onPhotosChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
 
-    setPhotos(colorVariant.id, files.map((file, Order) => ({
+    setPhotos(colorVariant.clientId, files.map((file, Order) => ({
       FileName: file.name,
       file,
       Order,
@@ -29,7 +29,7 @@ export function ColorForm({
       <CustomInput
         placeholder="colorHex"
         defaultValue={colorVariant.ColorHex}
-        onChange={e => setColor(colorVariant.id, e.currentTarget.value)}
+        onChange={e => setColor(colorVariant.clientId, e.currentTarget.value)}
       />
 
       {colorVariant.Sizes.map(cs =>
@@ -41,7 +41,7 @@ export function ColorForm({
           <CustomInput
             placeholder={cs.Size}
             defaultValue={cs.Quantity}
-            onChange={e => setQuantity(colorVariant.id, cs.Size, parseInt(e.currentTarget.value))}
+            onChange={e => setQuantity(colorVariant.clientId, cs.Size, parseInt(e.currentTarget.value))}
           />
         </div>
       )}
