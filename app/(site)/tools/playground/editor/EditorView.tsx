@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
-import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, ItemFullDto } from "./types";
+import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, EditItemColorVariantDto, EditItemRequest, EditItemTranslationDto, EditPhotoDto, ItemEditDto, ItemFullDto } from "./types";
 
 
 
@@ -31,6 +31,7 @@ function genEmptyColor(): ClientColor {
 }
 
 export default function EditorView({ slug }: { slug?: string }) {
+  const [origItem, setOrigItem] = useState<ItemEditDto | null>(null);
   const articleRef = useRef<HTMLInputElement | null>(null);
   const categoryRef = useRef<HTMLInputElement | null>(null);
   const priceRef = useRef<HTMLInputElement | null>(null);
@@ -44,11 +45,18 @@ export default function EditorView({ slug }: { slug?: string }) {
   useEffect(() => {
     if (!slug) return;
 
-    fetch("http://localhost:5000/api/items/by-slug/" + slug)
+    fetch(`http://localhost:5000/api/items/by-slug/${slug}/edit`)
       .then(r => r.json())
       .then(j => {
-        const dto = j as ItemFullDto;
+        const dto = j as ItemEditDto;
+        setOrigItem(dto);
 
+        setTranslations(dto.translations.map(it => ({
+          LanguageCode: it.languageCode,
+          Name: it.name,
+          Description: it.description,
+          Material: it.material,
+        }) satisfies ClientTranslation))
         setColors(dto.colors.map(c => ({
           serverId: c.id,
           clientId: c.id,
@@ -77,26 +85,26 @@ export default function EditorView({ slug }: { slug?: string }) {
   }
 
   const setQuantity = (colorId: string, size: string, quantity: number) => {
-    setColors(crs => crs.map(c =>
+    setColors(crs => crs.map(c => (
       c.clientId === colorId
         ? {
           ...c,
-          Sizes: c.sizes.map(cs =>
+          sizes: c.sizes.map(cs => (
             cs.size === size
-              ? { ...cs, Quantity: quantity }
+              ? { ...cs, quantity: quantity }
               : cs
-          ),
+          ) satisfies ClientSize),
         }
         : c
-    ));
+    ) satisfies ClientColor));
   }
 
   const setColor = (colorId: string, colorHex: string) => {
-    setColors(crs => crs.map(c =>
+    setColors(crs => crs.map(c => (
       c.clientId === colorId
-        ? { ...c, ColorHex: colorHex }
+        ? { ...c, colorHex: colorHex }
         : c
-    ));
+    ) satisfies ClientColor));
   }
 
   const addColor = () => {
@@ -104,11 +112,18 @@ export default function EditorView({ slug }: { slug?: string }) {
   }
 
   const setPhotos = (colorId: string, photos: ClientPhoto[]) => {
-    setColors(crs => crs.map(c =>
+    setColors(crs => crs.map(c => (
       c.clientId === colorId
-        ? { ...c, Photos: photos, }
+        ? { ...c, photos: photos, }
         : c
-    ))
+    ) satisfies ClientColor));
+  }
+
+  const onSend = async () => {
+    if (origItem)
+      await onEdit();
+    else
+      await onSend();
   }
 
   const onCreate = async () => {
@@ -165,12 +180,65 @@ export default function EditorView({ slug }: { slug?: string }) {
     }
   }
 
+  const onEdit = async () => {
+    const article = articleRef.current?.value;
+    const category = categoryRef.current?.value;
+    const price = priceRef.current?.value;
+    const newPrice = newPriceRef.current?.value;
+
+    // sanity checks
+    if (!article || !price || !category) return;
+    if (colors.length < 1) return;
+
+    // add item info
+    const formData = new FormData();
+
+    const payload = { // jesus
+      Article: article,
+      Category: category,
+      Price: parseFloat(price),
+      NewPrice: newPrice ? parseFloat(newPrice) : undefined,
+      Translations: translations,
+      ColorVariants: colors.map(c => ({
+        Id: c.serverId,
+        ColorHex: c.colorHex,
+        // NOTE: can't edit sizes here.
+        Photos: c.photos.map(p => ({
+          // this should work good enough
+          Id: p.serverId,
+          FileName: p.fileName,
+          SortOrder: p.sortOrder,
+          IsMain: p.isMain,
+        }) satisfies EditPhotoDto),
+      }) satisfies EditItemColorVariantDto),
+    } satisfies EditItemRequest;
+
+    formData.append("item", JSON.stringify(payload));
+
+    // add photo files
+    colors.forEach(c =>
+      c.photos.forEach(p => formData.append("files", p.file!))
+    );
+
+    // send request
+    const res = await fetch(`http://localhost:5000/api/items/${origItem!.id}`, {
+      method: "PATCH",
+      body: formData,
+    });
+
+    if (res.ok) {
+      const j = await res.json();
+      redirect("/tools/playground/" + j.slug);
+    } else {
+      sendError(await res.json())
+    }
+  }
   return (
     <div className="flex flex-col gap-2 w-full">
-      <CustomInput ref={articleRef} placeholder="article" />
-      <CustomInput ref={categoryRef} placeholder="category" />
-      <CustomInput ref={priceRef} placeholder="price" />
-      <CustomInput ref={newPriceRef} placeholder="new price" />
+      <CustomInput ref={articleRef} placeholder="article" defaultValue={origItem?.article} />
+      <CustomInput ref={categoryRef} placeholder="category" defaultValue={origItem?.category} />
+      <CustomInput ref={priceRef} placeholder="price" defaultValue={origItem?.price} />
+      <CustomInput ref={newPriceRef} placeholder="new price" defaultValue={origItem?.newPrice} />
 
       <div className="flex flex-row gap-2">
         {translations.map(tr => <TranslationForm translation={tr} setTranslation={setTranslation} key={tr.LanguageCode} />)}
@@ -179,6 +247,7 @@ export default function EditorView({ slug }: { slug?: string }) {
       <div className="flex flex-row gap-2">
         {colors.map(c =>
           <ColorForm
+            editing={origItem !== null}
             colorVariant={c}
             setColor={setColor}
             setQuantity={setQuantity}
@@ -191,7 +260,7 @@ export default function EditorView({ slug }: { slug?: string }) {
         </CustomButton>
       </div>
 
-      <CustomButton onClick={onCreate}>Submit</CustomButton>
+      <CustomButton onClick={onSend}>Submit</CustomButton>
     </div>
   )
 }

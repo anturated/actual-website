@@ -4,10 +4,25 @@
 export interface ItemFullDto {
   id: string,
   article: string,
+  category: string,
 
   title: string,
   description: string,
   material: string,
+  slug: string,
+
+  price: number,
+  newPrice: number,
+
+  colors: ItemColorDto[],
+}
+
+export interface ItemEditDto {
+  id: string,
+  article: string,
+  category: string,
+
+  translations: TranslationDto[],
 
   price: number,
   newPrice: number,
@@ -26,9 +41,9 @@ export interface CreateItemRequest {
   ColorVariants: CreateItemColorVariantDto[],
 }
 
-export interface EditItemDto {
+export interface EditItemRequest {
   Article: string,
-  Categoory: string,
+  Category: string,
   Price: number,
   NewPrice?: number,
   Translations: EditItemTranslationDto[]
@@ -63,7 +78,7 @@ export interface EditItemColorVariantDto {
   // id is non-null on existing/old objects
   Id?: string,
   ColorHex: string,
-  Sizes: EditItemSizeVariantDto[],
+  // NOTE: can't edit sizes here
   Photos: EditPhotoDto[],
 }
 
@@ -75,6 +90,13 @@ export interface ClientTranslation {
   Name: string,
   Description: string,
   Material: string,
+}
+
+export interface TranslationDto {
+  languageCode: string,
+  name: string,
+  description: string,
+  material: string,
 }
 
 export interface CreateItemTranslationDto {

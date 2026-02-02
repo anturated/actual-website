@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react"
 import { ItemColorDto, ItemFullDto, PhotoDto } from "../editor/types";
+import { MaterialIcon } from "@/components/MaterialIcon";
+import Link from "next/link";
 
 export default function ItemView({ slug }: { slug: string }) {
   const [item, setItem] = useState<ItemFullDto | null>()
@@ -23,6 +25,9 @@ export default function ItemView({ slug }: { slug: string }) {
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-semibold">
             {item?.title}
+            <Link href={`/tools/playground/${item.slug}/edit`}>
+              <MaterialIcon className="text-primary font-bold">ink_pen</MaterialIcon>
+            </Link>
           </h1>
 
           <p>
