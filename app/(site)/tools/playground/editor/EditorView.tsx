@@ -40,11 +40,6 @@ export default function EditorView() {
     { LanguageCode: "de", Name: "", Description: "", Material: "" },
   ]);
 
-  useEffect(() => {
-    const tr = translations.find(t => t.LanguageCode === "en")?.Name;
-    console.log(`translations changed ${tr}`)
-  }, [translations])
-
   const setTranslation = (translation: CreateItemTranslationDto) => {
     setTranslations(trs => trs.map(tr =>
       tr.LanguageCode === translation.LanguageCode
