@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react"
 import { ItemColorDto, ItemFullDto, PhotoDto } from "../editor/types";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default function ItemView({ slug }: { slug: string }) {
   const [item, setItem] = useState<ItemFullDto | null>()
@@ -17,6 +18,16 @@ export default function ItemView({ slug }: { slug: string }) {
       .then(j => setItem(j));
   }, []);
 
+  const onDelete = async () => {
+    const res = await fetch(`http://localhost:5000/api/items/${item?.id}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) return;
+
+    redirect("/tools/playground");
+  }
+
   return (
     <div className="w-full flex flex-row gap-2" >
       {item && <>
@@ -28,6 +39,9 @@ export default function ItemView({ slug }: { slug: string }) {
             <Link href={`/tools/playground/${item.slug}/edit`}>
               <MaterialIcon className="text-primary font-bold">ink_pen</MaterialIcon>
             </Link>
+            <button className="text-error" onClick={onDelete}>
+              <MaterialIcon>delete</MaterialIcon>
+            </button>
           </h1>
 
           <p>

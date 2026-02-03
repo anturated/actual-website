@@ -249,6 +249,7 @@ export default function EditorView({ slug }: { slug?: string }) {
           <ColorForm
             editing={origItem !== null}
             colorVariant={c}
+            itemId={origItem?.id}
             setColor={setColor}
             setQuantity={setQuantity}
             setPhotos={setPhotos}
