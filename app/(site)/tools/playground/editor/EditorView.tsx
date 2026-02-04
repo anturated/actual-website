@@ -123,7 +123,7 @@ export default function EditorView({ slug }: { slug?: string }) {
     if (origItem)
       await onEdit();
     else
-      await onSend();
+      await onCreate();
   }
 
   const onCreate = async () => {
