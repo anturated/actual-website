@@ -111,6 +111,10 @@ export default function EditorView({ slug }: { slug?: string }) {
     setColors(crs => [...crs, genEmptyColor()]);
   }
 
+  const removeColor = (id: string) => {
+    setColors(crs => crs.filter(c => c.clientId !== id));
+  }
+
   const setPhotos = (colorId: string, photos: ClientPhoto[]) => {
     setColors(crs => crs.map(c => (
       c.clientId === colorId
@@ -203,6 +207,13 @@ export default function EditorView({ slug }: { slug?: string }) {
         Id: c.serverId,
         ColorHex: c.colorHex,
         // NOTE: can't edit sizes here.
+        // but must add
+        Sizes: c.serverId
+          ? undefined
+          : c.sizes.map(s => ({
+            Size: s.size,
+            Quantity: s.quantity
+          }) satisfies CreateItemSizeVariantDto),
         Photos: c.photos.map(p => ({
           // this should work good enough
           Id: p.serverId,
@@ -253,6 +264,7 @@ export default function EditorView({ slug }: { slug?: string }) {
             setColor={setColor}
             setQuantity={setQuantity}
             setPhotos={setPhotos}
+            removeColor={removeColor}
             key={c.clientId}
           />
         )}

@@ -2,6 +2,8 @@ import { CustomInput } from "@/components/CustomInput"
 import { ChangeEvent, useRef } from "react"
 import { ClientColor, ClientPhoto, ClientSize, EditItemColorVariantDto, ItemColorDto, ItemSizeDto } from "./types"
 import { CustomButton } from "@/components/CustomButton";
+import Image from "next/image";
+import { MaterialIcon } from "@/components/MaterialIcon";
 
 const OPERATION = [
   "reserve", "release"
@@ -16,12 +18,14 @@ export function ColorForm({
   setQuantity,
   setPhotos,
   editing = false,
+  removeColor,
 }: {
   colorVariant: ClientColor,
   itemId?: string,
   setColor: (colorId: string, colorHex: string) => void,
   setQuantity: (colorId: string, size: string, quantity: number) => void
   setPhotos: (colorId: string, photos: ClientPhoto[]) => void
+  removeColor: (id: string) => void
   editing?: boolean,
 }) {
 
@@ -34,6 +38,7 @@ export function ColorForm({
       file,
       sortOrder,
       isMain: sortOrder === 0,
+      url: URL.createObjectURL(file),
     }) satisfies ClientPhoto));
   }
 
@@ -43,6 +48,9 @@ export function ColorForm({
 
   return (
     <div className="flex flex-col gap-2 p-2 outline-2 outline-outline">
+      <button className="rounded-md bg-error text-on-error" onClick={() => removeColor(colorVariant.clientId)}>
+        <MaterialIcon>delete</MaterialIcon>
+      </button>
       <CustomInput
         placeholder="colorHex"
         defaultValue={colorVariant.colorHex}
@@ -54,8 +62,8 @@ export function ColorForm({
           className="flex flex-row justify-between items-center gap-3"
           key={cs.size}
         >
-          <p>{editing ? `${cs.size}: ${cs.quantity}` : cs.size}</p>
-          {!editing ? (
+          <p>{colorVariant.serverId ? `${cs.size}: ${cs.quantity}` : cs.size}</p>
+          {!colorVariant.serverId ? (
             <CustomInput
               placeholder="Stock"
               defaultValue={cs.quantity}
@@ -76,8 +84,20 @@ export function ColorForm({
         multiple
         onChange={onPhotosChange}
       />
+
+      <div className="grid grid-cols-3 gap-2">
+        {colorVariant.photos.map(p => (
+          <div className="relative w-full h-30 rounded-xl overflow-clip" key={p.clientId} >
+            <Image src={p.url!} alt="photo" fill />
+          </div>
+        ))}
+      </div>
     </div>
   )
+}
+
+function Photo({ photo }: { photo: ClientPhoto }) {
+
 }
 
 interface EditStockRequest {

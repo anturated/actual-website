@@ -79,6 +79,8 @@ export interface EditItemColorVariantDto {
   Id?: string,
   ColorHex: string,
   // NOTE: can't edit sizes here
+  // but can add
+  Sizes?: CreateItemSizeVariantDto[],
   Photos: EditPhotoDto[],
 }
 
