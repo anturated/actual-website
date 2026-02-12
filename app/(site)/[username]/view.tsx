@@ -1,6 +1,5 @@
 "use client"
 
-import { UserDTO } from "@/data/user-dto";
 import Calendar from "./calendar";
 import ApiKeyRetriever from "./ApiKeyRetriever";
 import { CustomButton } from "@/components/CustomButton";
@@ -9,11 +8,16 @@ import useSWR from "swr";
 import { meFetcher, userFetcher } from "@/lib/fetchers";
 import Image from "next/image";
 import { MaterialIcon } from "@/components/MaterialIcon";
+import { UserDTO } from "@/app/api/users/route";
 
 
-export default function ProfileView({ username }: { username: string }) {
+export default function ProfileView({ user }: { user: UserDTO }) {
 
-  const { data, mutate } = useSWR(`/api/users?u=${username}`, userFetcher);
+  const { data, mutate } = useSWR(
+    `/api/users/${user.id}`,
+    userFetcher,
+    { fallback: { user } }
+  );
 
   const { data: meData } = useSWR("/api/me", meFetcher);
   const isOwner = useMemo(() => {
@@ -25,7 +29,9 @@ export default function ProfileView({ username }: { username: string }) {
     e.preventDefault();
     const target = e.currentTarget;
 
-    const res = await fetch("/api/users/avatar", {
+    if (!data?.user) return;
+
+    const res = await fetch(`/api/users/${data?.user.id}/avatar`, {
       method: "POST",
       body: new FormData(target)
     });
@@ -45,11 +51,10 @@ export default function ProfileView({ username }: { username: string }) {
 
     if (!newUsername && !newDescription) return false;
 
-    const res = await fetch("/api/users", {
+    const res = await fetch(`/api/users/${data.user.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: data.user.id,
         username: newUsername,
         description: newDescription,
       })
@@ -70,10 +75,10 @@ export default function ProfileView({ username }: { username: string }) {
       {/* prifile + calendar */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         {/* pfp + text info */}
-        <UserDisplay username={username} user={data?.user} isOwner={isOwner} onSave={onSave} />
+        <UserDisplay username={data?.user?.username ?? ""} user={data?.user} isOwner={isOwner} onSave={onSave} />
 
         {data?.user &&
-          <Calendar username={data.user.username} />
+          <Calendar userId={data.user.id} />
         }
       </div>
 
@@ -119,7 +124,7 @@ function UserDisplay({ username, user, isOwner, onSave }: { username: string, us
       <div className="flex justify-around relative rounded-4xl overflow-hidden items-center w-[128px] md:w-[256px] h-[128px] md:h-[256px] bg-surface-bright">
         {user && hasAvatar &&
           <Image
-            src={`/api/users/avatar/${user.id!}`}
+            src={`/api/users/${user.id!}/avatar`}
             alt="pfp"
             className="object-cover"
             fill
@@ -171,7 +176,7 @@ function UserDisplay({ username, user, isOwner, onSave }: { username: string, us
 
             <textarea
               className="grow resize-none italic text-xs md:text-sm text-wrap bg-surface-container rounded-lg"
-              defaultValue={user.description}
+              defaultValue={user.description ?? ""}
               ref={textRef}
             />
 

@@ -2,11 +2,11 @@
 
 import useSWR from "swr";
 import { usersFetcher } from "@/lib/fetchers";
-import { UserDTO } from "@/data/user-dto";
 import { CustomInput } from "@/components/CustomInput";
 import { ALL_PERMS, Perm } from "@/lib/perms";
 import { FormEvent, useMemo, useRef, useState } from "react";
 import { CustomButton } from "@/components/CustomButton";
+import { UserDTO } from "@/app/api/users/route";
 
 type UserEdit = {
   username?: string,
@@ -168,7 +168,7 @@ function UserListItem({
   const roleData = useMemo(() => {
     const base = [...origUser.perms, ...(edits?.removeRoles ?? [])].map(p => ({
       perm: p,
-      state: (edits?.removeRoles?.includes(p) ? "removed" : edits?.addRoles?.includes(p) ? "added" : "default") as RoleState,
+      state: (edits?.removeRoles?.includes(p as Perm) ? "removed" : edits?.addRoles?.includes(p as Perm) ? "added" : "default") as RoleState,
     }));
 
     return [...base].sort((a, b) =>
@@ -194,7 +194,7 @@ function UserListItem({
 
       <div className="flex flex-row flex-wrap gap-4">
         {roleData.map(d => <Role
-          perm={d.perm}
+          perm={d.perm as Perm}
           state={d.state}
           onClick={() => onRoleClick(origUser.id, d.perm)}
           key={d.perm}

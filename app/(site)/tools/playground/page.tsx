@@ -1,3 +1,75 @@
+"use client"
+
+import { MaterialIcon } from "@/components/MaterialIcon";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { LoginDisplay } from "./LoginDisplay";
+import { STORE_API_URL } from "./editor/types";
+
+interface ItemCardDto {
+  article: string,
+  title: string
+  slug: string,
+
+  price: number,
+  newPrice?: number,
+
+  photoUrl: string,
+}
+
 export default function Playground() {
-  return "Work-related (current project) clickable stuff will be here"
+  const [items, setItems] = useState<ItemCardDto[] | null>(null);
+
+  useEffect(() => {
+    const res = fetch(`${STORE_API_URL}/api/items`)
+      .then(r => r.json())
+      .then(j => setItems(j));
+
+    console.log(items);
+  }, []);
+
+  return (<>
+    <LoginDisplay />
+    <div className="grid grid-cols-3 gap-3 w-full" >
+      {
+        items && items.map(i =>
+          <ItemCard item={i} key={i.article} />
+        )
+      }
+
+      <Link href="/tools/playground/editor" className="flex flex-row justify-around items-center rounded-2xl bg-surface-container">
+        <MaterialIcon>Add</MaterialIcon>
+      </Link>
+    </div>
+  </>)
+}
+
+function ItemCard({ item }: { item: ItemCardDto }) {
+  return (
+    <div className="rounded-2xl outline-2 outline-outline-variant flex flex-col p-2 gap-2" >
+      <div className="relative w-full h-40 rounded-2xl overflow-clip">
+        <Image
+          src={item.photoUrl}
+          alt={item.slug}
+          fill
+        />
+      </div>
+      <Link className="text-xl font-semibold" href={`/tools/playground/${item.slug}`}>
+        {item.title}
+      </Link>
+
+      <p>
+        <span className={`italic ${item.newPrice !== null ? "text-outline" : "text-secondary font-semibold"}`}>
+          {item.price}
+        </span>
+
+        {item.newPrice &&
+          <span className={`italic font-semibold text-error`}>
+            {` ${item.newPrice}`}
+          </span>
+        }
+      </p>
+    </div>
+  )
 }
