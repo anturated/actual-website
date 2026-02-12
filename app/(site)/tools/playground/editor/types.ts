@@ -1,3 +1,4 @@
+export const STORE_API_URL = process.env.NEXT_PUBLIC_STORE_API_URL
 //
 //    ITEM
 //

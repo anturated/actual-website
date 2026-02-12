@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react"
-import { ClientColor, ItemColorDto, ItemFullDto, PhotoDto } from "../editor/types";
+import { ClientColor, ItemColorDto, ItemFullDto, PhotoDto, STORE_API_URL } from "../editor/types";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { LoginDisplay, UserInfo } from "../LoginDisplay";
 
 export default function ItemView({ slug }: { slug: string }) {
   const [item, setItem] = useState<ItemFullDto | null>()
@@ -14,17 +15,39 @@ export default function ItemView({ slug }: { slug: string }) {
     return item?.colors.find(c => c.id === variantId);
   }, [variantId]);
 
+  const [userData, setUserData] = useState<UserInfo | null>();
+
   useEffect(() => {
-    const res = fetch("http://localhost:5000/api/items/by-slug/" + slug, {
+    const res = fetch(`${STORE_API_URL}/api/items/by-slug/` + slug, {
       headers: { "Accept-language": "de" },
     })
       .then(r => r.json())
-      .then(j => { setItem(j); setVariantId(j.colors.find(c => true).id) });
+      .then(j => {
+        const data: ItemFullDto = j;
+        setItem(data);
+        setVariantId(data.colors.find(c => c)?.id);
+      });
+  }, []);
+
+  useEffect(() => {
+    const res = fetch(`${STORE_API_URL}/api/auth/profile`, {
+      headers: { "Accept-language": "de" },
+    })
+      .then(r => r.json())
+      .then(j => {
+        const data: ItemFullDto = j;
+        setItem(data);
+        setVariantId(data.colors.find(c => c)?.id);
+      });
   }, []);
 
   const onDelete = async () => {
-    const res = await fetch(`http://localhost:5000/api/items/${item?.id}`, {
-      method: "DELETE"
+    const token = localStorage.getItem("store_token");
+    if (!token) return;
+
+    const res = await fetch(`${STORE_API_URL}/api/items/${item?.id}`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${token}` }
     });
 
     if (!res.ok) return;
@@ -32,7 +55,8 @@ export default function ItemView({ slug }: { slug: string }) {
     redirect("/tools/playground");
   }
 
-  return (
+  return (<>
+    <LoginDisplay />
     <div className="w-full flex flex-row gap-2" >
       {item && activeVariant && <>
         <Photos variant={activeVariant} />
@@ -68,7 +92,7 @@ export default function ItemView({ slug }: { slug: string }) {
         </div>
       </>}
     </div>
-  )
+  </>)
 }
 
 function Photos({ variant }: { variant: ItemColorDto }) {

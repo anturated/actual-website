@@ -4,6 +4,8 @@ import { MaterialIcon } from "@/components/MaterialIcon";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LoginDisplay } from "./LoginDisplay";
+import { STORE_API_URL } from "./editor/types";
 
 interface ItemCardDto {
   article: string,
@@ -20,14 +22,15 @@ export default function Playground() {
   const [items, setItems] = useState<ItemCardDto[] | null>(null);
 
   useEffect(() => {
-    const res = fetch("http://localhost:5000/api/items")
+    const res = fetch(`${STORE_API_URL}/api/items`)
       .then(r => r.json())
       .then(j => setItems(j));
 
     console.log(items);
   }, []);
 
-  return (
+  return (<>
+    <LoginDisplay />
     <div className="grid grid-cols-3 gap-3 w-full" >
       {
         items && items.map(i =>
@@ -39,7 +42,7 @@ export default function Playground() {
         <MaterialIcon>Add</MaterialIcon>
       </Link>
     </div>
-  )
+  </>)
 }
 
 function ItemCard({ item }: { item: ItemCardDto }) {

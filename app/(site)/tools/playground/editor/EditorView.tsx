@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
-import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, EditItemColorVariantDto, EditItemRequest, EditItemTranslationDto, EditPhotoDto, ItemEditDto, ItemFullDto } from "./types";
+import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, EditItemColorVariantDto, EditItemRequest, EditItemTranslationDto, EditPhotoDto, ItemEditDto, ItemFullDto, STORE_API_URL } from "./types";
 
 
 
@@ -45,8 +45,12 @@ export default function EditorView({ slug }: { slug?: string }) {
   useEffect(() => {
     if (!slug) return;
 
-    fetch(`http://localhost:5000/api/items/by-slug/${slug}/edit`)
-      .then(r => r.json())
+    const token = localStorage.getItem("store_token");
+    if (!token) return;
+
+    fetch(`${STORE_API_URL}/api/items/by-slug/${slug}/edit`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    }).then(r => r.json())
       .then(j => {
         const dto = j as ItemEditDto;
         setOrigItem(dto);
@@ -57,6 +61,7 @@ export default function EditorView({ slug }: { slug?: string }) {
           Description: it.description,
           Material: it.material,
         }) satisfies ClientTranslation))
+
         setColors(dto.colors.map(c => ({
           serverId: c.id,
           clientId: c.id,
@@ -140,6 +145,9 @@ export default function EditorView({ slug }: { slug?: string }) {
     if (!article || !price || !category) return;
     if (colors.length < 1) return;
 
+    const token = localStorage.getItem("store_token");
+    if (!token) return;
+
     // add item info
     const formData = new FormData();
 
@@ -171,8 +179,9 @@ export default function EditorView({ slug }: { slug?: string }) {
     );
 
     // send request
-    const res = await fetch("http://localhost:5000/api/items", {
+    const res = await fetch(`${STORE_API_URL}/api/items`, {
       method: "POST",
+      headers: { "Authorization": `Bearer ${token}` },
       body: formData,
     });
 
@@ -193,6 +202,9 @@ export default function EditorView({ slug }: { slug?: string }) {
     // sanity checks
     if (!article || !price || !category) return;
     if (colors.length < 1) return;
+
+    const token = localStorage.getItem("store_token");
+    if (!token) return;
 
     // add item info
     const formData = new FormData();
@@ -232,8 +244,9 @@ export default function EditorView({ slug }: { slug?: string }) {
     );
 
     // send request
-    const res = await fetch(`http://localhost:5000/api/items/${origItem!.id}`, {
+    const res = await fetch(`${STORE_API_URL}/api/items/${origItem!.id}`, {
       method: "PATCH",
+      headers: { "Authorization": `Bearer ${token}` },
       body: formData,
     });
 
