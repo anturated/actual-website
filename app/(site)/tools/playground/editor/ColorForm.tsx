@@ -32,23 +32,31 @@ export function ColorForm({
   const onPhotosChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
 
-    setPhotos(colorVariant.clientId, files.map((file, sortOrder) => ({
+    setPhotos(colorVariant.clientId, [...colorVariant.photos, ...files.map((file, sortOrder) => ({
       clientId: crypto.randomUUID(),
       fileName: file.name,
       file,
       sortOrder,
-      isMain: sortOrder === 0,
+      isMain: sortOrder === 0 && !colorVariant.photos.some(p => p.isMain),
       url: URL.createObjectURL(file),
-    }) satisfies ClientPhoto));
+    }) satisfies ClientPhoto)]);
   }
 
   const onStockEdited = (size: string, quantity: number) => {
     setQuantity(colorVariant.clientId, size, quantity);
   }
 
+  const setPhotoMain = (id: string) => {
+    setPhotos(colorVariant.clientId, colorVariant.photos.map(c => c.clientId !== id ? { ...c, isMain: false } : { ...c, isMain: true }));
+  }
+
+  const deletePhoto = (id: string) => {
+    setPhotos(colorVariant.clientId, colorVariant.photos.filter(p => p.clientId !== id));
+  }
+
   return (
     <div className="flex flex-col gap-2 p-2 outline-2 outline-outline">
-      <button className="rounded-md bg-error text-on-error" onClick={() => removeColor(colorVariant.clientId)}>
+      <button className="flex items-center justify-around p-1 rounded-md bg-error text-on-error" onClick={() => removeColor(colorVariant.clientId)}>
         <MaterialIcon>delete</MaterialIcon>
       </button>
       <CustomInput
@@ -86,18 +94,40 @@ export function ColorForm({
       />
 
       <div className="grid grid-cols-3 gap-2">
-        {colorVariant.photos.map(p => (
-          <div className="relative w-full h-30 rounded-xl overflow-clip" key={p.clientId} >
-            <Image src={p.url!} alt="photo" fill />
-          </div>
-        ))}
+        {colorVariant.photos.map(p => <EditorPhoto
+          photo={p}
+          setPhotoMain={setPhotoMain}
+          deletePhoto={deletePhoto}
+          key={p.clientId}
+        />)}
       </div>
     </div>
   )
 }
 
-function Photo({ photo }: { photo: ClientPhoto }) {
-
+function EditorPhoto({
+  photo,
+  setPhotoMain,
+  deletePhoto,
+}: {
+  photo: ClientPhoto,
+  setPhotoMain: (id: string) => void
+  deletePhoto: (id: string) => void
+}) {
+  return (
+    <div className="relative w-full h-30 rounded-xl overflow-clip" key={photo.clientId} >
+      <Image src={photo.url!} alt="photo" fill />
+      <button className="absolute left-2 top-2 bg-tertiary text-on-tertiary rounded-sm flex items-center" onClick={() => setPhotoMain(photo.clientId)}>
+        <MaterialIcon>{photo.isMain ? "check_box" : "check_box_outline_blank"}</MaterialIcon>
+      </button>
+      <button className="absolute right-2 top-2 bg-error text-on-error rounded-sm flex items-center" onClick={() => deletePhoto(photo.clientId)}>
+        <MaterialIcon>delete</MaterialIcon>
+      </button>
+      <div className="absolute bottom-2 left-2 bg-surface-container-high text-on-background rounded-sm flex items-center">
+        <MaterialIcon>{photo.serverId ? "cloud_done" : "drive_folder_upload"}</MaterialIcon>
+      </div>
+    </div>
+  )
 }
 
 interface EditStockRequest {
