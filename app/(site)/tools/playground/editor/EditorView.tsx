@@ -251,8 +251,32 @@ export default function EditorView({ slug }: { slug?: string }) {
     });
 
     if (res.ok) {
-      const j = await res.json();
-      redirect("/tools/playground/" + j.slug);
+      const dto: ItemEditDto = await res.json();
+
+      setTranslations(dto.translations.map(it => ({
+        LanguageCode: it.languageCode,
+        Name: it.name,
+        Description: it.description,
+        Material: it.material,
+      }) satisfies ClientTranslation))
+
+      setColors(dto.colors.map(c => ({
+        serverId: c.id,
+        clientId: c.id,
+        colorHex: c.colorHex,
+        sizes: c.sizes.map(cs => ({
+          size: cs.size,
+          quantity: cs.quantity,
+        }) satisfies ClientSize),
+        photos: c.photos.map(p => ({
+          serverId: p.id,
+          clientId: p.id,
+          url: p.url,
+          isMain: p.isMain,
+          sortOrder: p.sortOrder,
+        }) satisfies ClientPhoto),
+      })));
+      // redirect("/tools/playground/" + j.slug);
     } else {
       sendError(await res.json())
     }
