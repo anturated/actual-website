@@ -7,7 +7,7 @@ import { STORE_API_URL } from "./editor/types";
 export interface UserInfo {
   id: string,
   name?: string,
-  role: string,
+  role: number,
 }
 
 export function LoginDisplay() {
