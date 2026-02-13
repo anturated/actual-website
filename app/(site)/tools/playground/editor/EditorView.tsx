@@ -292,7 +292,7 @@ export default function EditorView({ slug }: { slug?: string }) {
         {translations.map(tr => <TranslationForm translation={tr} setTranslation={setTranslation} key={tr.LanguageCode} />)}
       </div>
 
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 overflow-scroll ">
         {colors.map(c =>
           <ColorForm
             editing={origItem !== null}
