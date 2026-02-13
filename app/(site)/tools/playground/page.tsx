@@ -4,7 +4,7 @@ import { MaterialIcon } from "@/components/MaterialIcon";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { LoginDisplay } from "./LoginDisplay";
+import { LoginDisplay, UserInfo } from "./LoginDisplay";
 import { STORE_API_URL } from "./editor/types";
 
 interface ItemCardDto {
@@ -20,6 +20,7 @@ interface ItemCardDto {
 
 export default function Playground() {
   const [items, setItems] = useState<ItemCardDto[] | null>(null);
+  const [userData, setUserData] = useState<UserInfo | null>();
 
   useEffect(() => {
     const res = fetch(`${STORE_API_URL}/api/items`)
@@ -27,6 +28,16 @@ export default function Playground() {
       .then(j => setItems(j));
 
     console.log(items);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("store_token");
+    if (!token) return;
+
+    fetch(`${STORE_API_URL}/api/auth/profile`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    }).then(r => r.json())
+      .then(j => setUserData(j));
   }, []);
 
   return (<>
@@ -38,9 +49,11 @@ export default function Playground() {
         )
       }
 
-      <Link href="/tools/playground/editor" className="flex flex-row justify-around items-center rounded-2xl bg-surface-container">
-        <MaterialIcon>Add</MaterialIcon>
-      </Link>
+      {userData?.role === 0 &&
+        <Link href="/tools/playground/editor" className="flex flex-row justify-around items-center rounded-2xl bg-surface-container">
+          <MaterialIcon>Add</MaterialIcon>
+        </Link>
+      }
     </div>
   </>)
 }

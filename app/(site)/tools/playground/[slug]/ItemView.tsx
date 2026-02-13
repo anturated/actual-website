@@ -30,15 +30,13 @@ export default function ItemView({ slug }: { slug: string }) {
   }, []);
 
   useEffect(() => {
-    const res = fetch(`${STORE_API_URL}/api/auth/profile`, {
-      headers: { "Accept-language": "de" },
-    })
-      .then(r => r.json())
-      .then(j => {
-        const data: ItemFullDto = j;
-        setItem(data);
-        setVariantId(data.colors.find(c => c)?.id);
-      });
+    const token = localStorage.getItem("store_token");
+    if (!token) return;
+
+    fetch(`${STORE_API_URL}/api/auth/profile`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    }).then(r => r.json())
+      .then(j => setUserData(j));
   }, []);
 
   const onDelete = async () => {
@@ -56,7 +54,6 @@ export default function ItemView({ slug }: { slug: string }) {
   }
 
   return (<>
-    <LoginDisplay />
     <div className="w-full flex flex-row gap-2" >
       {item && activeVariant && <>
         <Photos variant={activeVariant} />
@@ -64,12 +61,14 @@ export default function ItemView({ slug }: { slug: string }) {
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-semibold">
             {item?.title}
-            <Link href={`/tools/playground/${item.slug}/edit`}>
-              <MaterialIcon className="text-primary font-bold">ink_pen</MaterialIcon>
-            </Link>
-            <button className="text-error" onClick={onDelete}>
-              <MaterialIcon>delete</MaterialIcon>
-            </button>
+            {userData?.role === 0 && <>
+              <Link href={`/tools/playground/${item.slug}/edit`}>
+                <MaterialIcon className="text-primary font-bold">ink_pen</MaterialIcon>
+              </Link>
+              <button className="text-error" onClick={onDelete}>
+                <MaterialIcon>delete</MaterialIcon>
+              </button>
+            </>}
           </h1>
 
           <Variants colors={item.colors} activeVariantId={variantId} setVariantId={setVariantId} />
@@ -89,6 +88,8 @@ export default function ItemView({ slug }: { slug: string }) {
           <p>Material: {item.material}</p>
 
           <p>{item.description}</p>
+
+          <Sizes activeColor={activeVariant} />
         </div>
       </>}
     </div>
@@ -157,5 +158,15 @@ function Variants({
       ))
       }
     </div >
+  )
+}
+
+function Sizes({ activeColor }: { activeColor?: ItemColorDto }) {
+  return (
+    <div>
+      {activeColor && activeColor.sizes.map(s => (
+        <p key={s.size}>{`${s.size}: ${s.quantity}`}</p>
+      ))}
+    </div>
   )
 }
