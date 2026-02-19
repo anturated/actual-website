@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { STORE_API_URL } from "./editor/types";
+import { getApiUrl } from "./editor/types";
 
 export interface UserInfo {
   id: string,
@@ -17,7 +17,7 @@ export function LoginDisplay() {
     const token = localStorage.getItem("store_token");
     if (!token) return;
 
-    fetch(`${STORE_API_URL}/api/auth/profile`, {
+    fetch(`${getApiUrl()}/api/auth/profile`, {
       headers: { "Authorization": `Bearer ${token}` }
     }).then(r => r.json())
       .then(j => setUserInfo(j));

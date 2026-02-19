@@ -1,6 +1,6 @@
 import { CustomInput } from "@/components/CustomInput"
 import { ChangeEvent, useRef } from "react"
-import { ClientColor, ClientPhoto, ClientSize, EditItemColorVariantDto, ItemColorDto, ItemSizeDto, STORE_API_URL } from "./types"
+import { ClientColor, ClientPhoto, ClientSize, EditItemColorVariantDto, ItemColorDto, ItemSizeDto, getApiUrl } from "./types"
 import { CustomButton } from "@/components/CustomButton";
 import Image from "next/image";
 import { MaterialIcon } from "@/components/MaterialIcon";
@@ -153,7 +153,7 @@ function EditStockRow({
     const token = localStorage.getItem("store_token");
     if (!token) return;
 
-    const res = await fetch(`${STORE_API_URL}/api/items/${itemId}/stock/${operation}`, {
+    const res = await fetch(`${getApiUrl()}/api/items/${itemId}/stock/${operation}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

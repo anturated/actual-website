@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LoginDisplay, UserInfo } from "./LoginDisplay";
-import { STORE_API_URL } from "./editor/types";
+import { getApiUrl } from "./editor/types";
+import { LocalSwitcher } from "./LocalSwitcher";
 
 interface ItemCardDto {
   article: string,
@@ -23,7 +24,7 @@ export default function Playground() {
   const [userData, setUserData] = useState<UserInfo | null>();
 
   useEffect(() => {
-    const res = fetch(`${STORE_API_URL}/api/items`)
+    const res = fetch(`${getApiUrl()}/api/items`)
       .then(r => r.json())
       .then(j => setItems(j));
 
@@ -34,14 +35,17 @@ export default function Playground() {
     const token = localStorage.getItem("store_token");
     if (!token) return;
 
-    fetch(`${STORE_API_URL}/api/auth/profile`, {
+    fetch(`${getApiUrl()}/api/auth/profile`, {
       headers: { "Authorization": `Bearer ${token}` }
     }).then(r => r.json())
       .then(j => setUserData(j));
   }, []);
 
   return (<>
-    <LoginDisplay />
+    <div className="grid grid-cols-2">
+      <LoginDisplay />
+      <LocalSwitcher />
+    </div>
     <div className="grid grid-cols-3 gap-3 w-full" >
       {
         items && items.map(i =>

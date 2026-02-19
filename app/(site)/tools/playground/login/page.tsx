@@ -4,7 +4,7 @@ import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { redirect } from "next/navigation";
 import { useRef } from "react";
-import { STORE_API_URL } from "../editor/types";
+import { getApiUrl } from "../editor/types";
 
 interface UserDto {
   token?: string,
@@ -27,7 +27,7 @@ export default function StoreLogin() {
     fd.append("login", login);
     fd.append("password", password);
 
-    const res = await fetch(`${STORE_API_URL}/api/auth/login`, {
+    const res = await fetch(`${getApiUrl()}/api/auth/login`, {
       method: "POST",
       body: fd,
     });
