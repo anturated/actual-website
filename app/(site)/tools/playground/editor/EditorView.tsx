@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
-import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, EditItemColorVariantDto, EditItemRequest, EditItemTranslationDto, EditPhotoDto, ItemEditDto, ItemFullDto, STORE_API_URL } from "./types";
+import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, EditItemColorVariantDto, EditItemRequest, EditItemTranslationDto, EditPhotoDto, ItemEditDto, ItemFullDto, getApiUrl } from "./types";
 import Image from "next/image";
 
 
@@ -50,7 +50,7 @@ export default function EditorView({ slug }: { slug?: string }) {
     const token = localStorage.getItem("store_token");
     if (!token) return;
 
-    fetch(`${STORE_API_URL}/api/items/by-slug/${slug}/edit`, {
+    fetch(`${getApiUrl()}/api/items/by-slug/${slug}/edit`, {
       headers: { "Authorization": `Bearer ${token}` }
     }).then(r => r.json())
       .then(j => {
@@ -186,7 +186,7 @@ export default function EditorView({ slug }: { slug?: string }) {
     formData.append("files", newSizesPhoto);
 
     // send request
-    const res = await fetch(`${STORE_API_URL}/api/items`, {
+    const res = await fetch(`${getApiUrl()}/api/items`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${token}` },
       body: formData,
@@ -256,7 +256,7 @@ export default function EditorView({ slug }: { slug?: string }) {
       formData.append("files", newSizesPhoto);
 
     // send request
-    const res = await fetch(`${STORE_API_URL}/api/items/${origItem!.id}`, {
+    const res = await fetch(`${getApiUrl()}/api/items/${origItem!.id}`, {
       method: "PATCH",
       headers: { "Authorization": `Bearer ${token}` },
       body: formData,

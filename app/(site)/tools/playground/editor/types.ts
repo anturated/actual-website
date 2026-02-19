@@ -1,4 +1,11 @@
-export const STORE_API_URL = process.env.NEXT_PUBLIC_STORE_API_URL
+export function getApiUrl() {
+  if (typeof window !== "undefined") {
+    const override = localStorage.getItem("store_api_url");
+    if (override) return override;
+  }
+
+  return process.env.NEXT_PUBLIC_STORE_API_URL!;
+}
 //
 //    ITEM
 //

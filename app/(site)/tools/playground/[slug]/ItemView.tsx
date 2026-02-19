@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react"
-import { ClientColor, ItemColorDto, ItemFullDto, PhotoDto, STORE_API_URL } from "../editor/types";
+import { ClientColor, ItemColorDto, ItemFullDto, PhotoDto, getApiUrl } from "../editor/types";
 import { MaterialIcon } from "@/components/MaterialIcon";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -18,7 +18,7 @@ export default function ItemView({ slug }: { slug: string }) {
   const [userData, setUserData] = useState<UserInfo | null>();
 
   useEffect(() => {
-    const res = fetch(`${STORE_API_URL}/api/items/by-slug/` + slug, {
+    const res = fetch(`${getApiUrl()}/api/items/by-slug/` + slug, {
       headers: { "Accept-language": "de" },
     })
       .then(r => r.json())
@@ -33,7 +33,7 @@ export default function ItemView({ slug }: { slug: string }) {
     const token = localStorage.getItem("store_token");
     if (!token) return;
 
-    fetch(`${STORE_API_URL}/api/auth/profile`, {
+    fetch(`${getApiUrl()}/api/auth/profile`, {
       headers: { "Authorization": `Bearer ${token}` }
     }).then(r => r.json())
       .then(j => setUserData(j));
@@ -43,7 +43,7 @@ export default function ItemView({ slug }: { slug: string }) {
     const token = localStorage.getItem("store_token");
     if (!token) return;
 
-    const res = await fetch(`${STORE_API_URL}/api/items/${item?.id}`, {
+    const res = await fetch(`${getApiUrl()}/api/items/${item?.id}`, {
       method: "DELETE",
       headers: { "Authorization": `Bearer ${token}` }
     });
