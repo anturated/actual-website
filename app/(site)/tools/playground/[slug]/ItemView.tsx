@@ -58,7 +58,7 @@ export default function ItemView({ slug }: { slug: string }) {
       {item && activeVariant && <>
         <Photos variant={activeVariant} />
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 grow">
           <h1 className="text-3xl font-semibold">
             {item?.title}
             {userData?.role === 0 && <>
@@ -90,6 +90,13 @@ export default function ItemView({ slug }: { slug: string }) {
           <p>{item.description}</p>
 
           <Sizes activeColor={activeVariant} />
+          <div className="relative w-full h-100">
+            <Image
+              src={item.sizesPhotoUrl ?? null}
+              alt="sizes photo"
+              fill
+            />
+          </div>
         </div>
       </>}
     </div>

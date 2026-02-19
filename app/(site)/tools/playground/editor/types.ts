@@ -14,6 +14,7 @@ export interface ItemFullDto {
 
   price: number,
   newPrice: number,
+  sizesPhotoUrl: string,
 
   colors: ItemColorDto[],
 }
@@ -28,6 +29,8 @@ export interface ItemEditDto {
   price: number,
   newPrice: number,
 
+  sizesPhotoUrl: string,
+
   colors: ItemColorDto[],
 }
 
@@ -39,6 +42,8 @@ export interface CreateItemRequest {
   Price: number,
   NewPrice?: number,
 
+  SizesPhotoName: string,
+
   ColorVariants: CreateItemColorVariantDto[],
 }
 
@@ -47,6 +52,7 @@ export interface EditItemRequest {
   Category: string,
   Price: number,
   NewPrice?: number,
+  SizesPhotoName?: string,
   Translations: EditItemTranslationDto[]
   ColorVariants: EditItemColorVariantDto[],
 }

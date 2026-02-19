@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { TranslationForm } from "./TranslationForm";
 import { ColorForm } from "./ColorForm";
 import { ClientColor, ClientPhoto, ClientSize, ClientTranslation, CreateItemColorVariantDto, CreateItemRequest, CreateItemSizeVariantDto, CreateItemTranslationDto, CreatePhotoDto, EditItemColorVariantDto, EditItemRequest, EditItemTranslationDto, EditPhotoDto, ItemEditDto, ItemFullDto, STORE_API_URL } from "./types";
+import Image from "next/image";
 
 
 
@@ -36,6 +37,7 @@ export default function EditorView({ slug }: { slug?: string }) {
   const categoryRef = useRef<HTMLInputElement | null>(null);
   const priceRef = useRef<HTMLInputElement | null>(null);
   const newPriceRef = useRef<HTMLInputElement | null>(null);
+  const sizesPhotoRef = useRef<HTMLInputElement | null>(null);
   const [colors, setColors] = useState<ClientColor[]>([genEmptyColor()]);
   const [translations, setTranslations] = useState<ClientTranslation[]>([
     { LanguageCode: "en", Name: "", Description: "", Material: "" },
@@ -140,10 +142,13 @@ export default function EditorView({ slug }: { slug?: string }) {
     const category = categoryRef.current?.value;
     const price = priceRef.current?.value;
     const newPrice = newPriceRef.current?.value;
+    const newSizesFiles = sizesPhotoRef.current?.files;
 
     // sanity checks
     if (!article || !price || !category) return;
     if (colors.length < 1) return;
+    if (!newSizesFiles || newSizesFiles.length == 0) return;
+    const newSizesPhoto = newSizesFiles[0];
 
     const token = localStorage.getItem("store_token");
     if (!token) return;
@@ -157,6 +162,7 @@ export default function EditorView({ slug }: { slug?: string }) {
       Price: parseFloat(price),
       NewPrice: newPrice ? parseFloat(newPrice) : undefined,
       Translations: translations,
+      SizesPhotoName: newSizesPhoto.name,
       ColorVariants: colors.map(c => ({
         ColorHex: c.colorHex,
         Sizes: c.sizes.map(cs => ({
@@ -177,6 +183,7 @@ export default function EditorView({ slug }: { slug?: string }) {
     colors.forEach(c =>
       c.photos.forEach(p => formData.append("files", p.file!))
     );
+    formData.append("files", newSizesPhoto);
 
     // send request
     const res = await fetch(`${STORE_API_URL}/api/items`, {
@@ -198,6 +205,8 @@ export default function EditorView({ slug }: { slug?: string }) {
     const category = categoryRef.current?.value;
     const price = priceRef.current?.value;
     const newPrice = newPriceRef.current?.value;
+    const newSizesFiles = sizesPhotoRef.current?.files;
+    const newSizesPhoto = (newSizesFiles && newSizesFiles?.length > 0) ? newSizesFiles[0] : null;
 
     // sanity checks
     if (!article || !price || !category) return;
@@ -215,6 +224,7 @@ export default function EditorView({ slug }: { slug?: string }) {
       Price: parseFloat(price),
       NewPrice: newPrice ? parseFloat(newPrice) : undefined,
       Translations: translations,
+      SizesPhotoName: newSizesPhoto?.name,
       ColorVariants: colors.map(c => ({
         Id: c.serverId,
         ColorHex: c.colorHex,
@@ -242,6 +252,8 @@ export default function EditorView({ slug }: { slug?: string }) {
     colors.forEach(c =>
       c.photos.forEach(p => formData.append("files", p.file!))
     );
+    if (newSizesPhoto)
+      formData.append("files", newSizesPhoto);
 
     // send request
     const res = await fetch(`${STORE_API_URL}/api/items/${origItem!.id}`, {
@@ -276,6 +288,8 @@ export default function EditorView({ slug }: { slug?: string }) {
           sortOrder: p.sortOrder,
         }) satisfies ClientPhoto),
       })));
+
+      setOrigItem(dto);
       // redirect("/tools/playground/" + j.slug);
     } else {
       sendError(await res.json())
@@ -308,6 +322,20 @@ export default function EditorView({ slug }: { slug?: string }) {
         <CustomButton className="h-min w-20" onClick={addColor}>
           <MaterialIcon>Add</MaterialIcon>
         </CustomButton>
+      </div>
+
+      <div className="flex flex-col outline-2 outline-outline p-2">
+        <p>Sizes Photo</p>
+        <input type="file" ref={sizesPhotoRef} />
+        {origItem?.sizesPhotoUrl &&
+          <div className="relative w-full h-200">
+            <Image
+              src={origItem?.sizesPhotoUrl}
+              alt="sizes photo"
+              fill
+            />
+          </div>
+        }
       </div>
 
       <CustomButton onClick={onSend}>Submit</CustomButton>
