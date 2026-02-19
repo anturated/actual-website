@@ -42,7 +42,7 @@ export default function Playground() {
   }, []);
 
   return (<>
-    <div className="grid grid-cols-2">
+    <div className="grid grid-cols-2 w-full">
       <LoginDisplay />
       <LocalSwitcher />
     </div>
