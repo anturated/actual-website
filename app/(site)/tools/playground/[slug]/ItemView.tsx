@@ -7,6 +7,7 @@ import { MaterialIcon } from "@/components/MaterialIcon";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LoginDisplay, UserInfo } from "../LoginDisplay";
+import { ItemCard, ItemCardDto } from "../view";
 
 export default function ItemView({ slug }: { slug: string }) {
   const [item, setItem] = useState<ItemFullDto | null>()
@@ -100,6 +101,7 @@ export default function ItemView({ slug }: { slug: string }) {
         </div>
       </>}
     </div>
+    {item && <Recs category={item?.category} />}
   </>)
 }
 
@@ -174,6 +176,27 @@ function Sizes({ activeColor }: { activeColor?: ItemColorDto }) {
       {activeColor && activeColor.sizes.map(s => (
         <p key={s.size}>{`${s.size}: ${s.quantity}`}</p>
       ))}
+    </div>
+  )
+}
+
+function Recs({ category }: { category: string }) {
+  const [recs, setRecs] = useState<ItemCardDto[]>([]);
+
+  useEffect(() => {
+    if (!category) setRecs([]);
+
+    fetch(`${getApiUrl()}/api/items?take=10&category=${category}&orderBy=4`)
+      .then(r => r.json())
+      .then(j => setRecs(j.items));
+  }, [category]);
+
+  return (
+    <div className="flex flex-row gap-2 w-full">
+      {recs.map(r => <ItemCard
+        item={r}
+        key={r.id}
+      />)}
     </div>
   )
 }
