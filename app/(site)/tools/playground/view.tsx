@@ -3,14 +3,15 @@
 import { MaterialIcon } from "@/components/MaterialIcon";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LoginDisplay, UserInfo } from "./LoginDisplay";
 import { getApiUrl } from "./editor/types";
 import { LocalSwitcher } from "./LocalSwitcher";
 import Categories from "./Categories";
 import { useSearchParams } from "next/navigation";
 
-interface ItemCardDto {
+export interface ItemCardDto {
+  id: string,
   article: string,
   title: string
   slug: string,
@@ -69,7 +70,8 @@ export default function PlaygroundView() {
   </>)
 }
 
-function ItemCard({ item }: { item: ItemCardDto }) {
+
+export function ItemCard({ item }: { item: ItemCardDto }) {
   return (
     <div className="rounded-2xl outline-2 outline-outline-variant flex flex-col p-2 gap-2" >
       <div className="relative w-full h-40 rounded-2xl overflow-clip">
