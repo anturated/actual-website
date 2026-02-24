@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { LoginDisplay, UserInfo } from "./LoginDisplay";
 import { getApiUrl } from "./editor/types";
 import { LocalSwitcher } from "./LocalSwitcher";
+import Categories from "./Categories";
+import { useSearchParams } from "next/navigation";
 
 interface ItemCardDto {
   article: string,
@@ -20,16 +22,20 @@ interface ItemCardDto {
 }
 
 export default function Playground() {
+  const searchParams = useSearchParams();
   const [items, setItems] = useState<ItemCardDto[] | null>(null);
   const [userData, setUserData] = useState<UserInfo | null>();
+  const category = searchParams.get('category');
 
   useEffect(() => {
-    const res = fetch(`${getApiUrl()}/api/items`)
+    const res = fetch(`${getApiUrl()}/api/items?take=10`
+      + (category ? `&Category=${category}` : "")
+    )
       .then(r => r.json())
-      .then(j => setItems(j));
+      .then(j => setItems(j.items));
 
     console.log(items);
-  }, []);
+  }, [category]);
 
   useEffect(() => {
     const token = localStorage.getItem("store_token");
@@ -46,6 +52,7 @@ export default function Playground() {
       <LoginDisplay />
       <LocalSwitcher />
     </div>
+    <Categories />
     <div className="grid grid-cols-3 gap-3 w-full" >
       {
         items && items.map(i =>
